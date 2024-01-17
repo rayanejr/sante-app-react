@@ -1,135 +1,145 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native';
-import axios from 'axios';
+import React from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 
-const LoginForm = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+const LoginScreen = () => {
+  return (
+    <ScrollView style={styles.container}>
+      <View style={styles.loginContainer}>
 
-    const handleSubmit = async () => {
-        try {
-            const response = await axios.post('URL_DE_VOTRE_API', { email, password });
-        } catch (error) {
-        }
-    };
-
-    return (
-        <View style={styles.container}>
-            <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                    <Text style={styles.headerTitle}>Connectez-vous à votre compte</Text>
-                </View>
-                <View style={styles.cardBody}>
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={setEmail}
-                        value={email}
-                        placeholder="Email"
-                        keyboardType="email-address"
-                        autoCapitalize="none"
-                    />
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={setPassword}
-                        value={password}
-                        placeholder="Mot de passe"
-                        secureTextEntry={true}
-                        autoCapitalize="none"
-                    />
-                    <TouchableOpacity style={styles.buttonPrimary} onPress={handleSubmit}>
-                        <Text style={styles.buttonText}>Se connecter</Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={() => { /* Logique pour mot de passe oublié */ }}>
-                        <Text style={styles.forgotPasswordLink}>Mot de passe oublié ?</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <Text style={styles.welcomeTitle}>Bienvenue sur Santé-App</Text>
-            <Text style={styles.welcomeText}>Rejoignez-nous et découvrez le moyen premium de vérifier votre état de santé, de gérer vos rendez-vous et de rester au courant de vos besoins médicaux en toute simplicité.</Text>
-            <TouchableOpacity onPress={() => {/* Navigation ou action */}}>
-                <Text style={styles.registerLink}>Inscrivez-vous maintenant</Text>
-            </TouchableOpacity>
+        {/* Information Section */}
+        <View style={styles.loginInfo}>
+          <Text style={styles.loginInfoTitle}>Bienvenue sur Santé-App</Text>
+          <Text style={styles.loginInfoText}>
+            Rejoignez-nous et découvrez le moyen premium de vérifier votre état de santé, de gérer vos rendez-vous et de rester au courant de vos besoins médicaux en toute simplicité.
+          </Text>
+          <Text style={styles.loginInfoText}>
+            Vous n'avez pas de compte ?{" "}
+            <Text style={styles.linkText}>Inscrivez-vous maintenant</Text>
+          </Text>
         </View>
-    );
-};
 
+        {/* Login Form */}
+        <View style={styles.loginFormContainer}>
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardHeaderText}>Connectez-vous à votre compte</Text>
+          </View>
+          <View style={styles.cardBody}>
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              keyboardType="email-address"
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Mot de passe"
+              secureTextEntry
+            />
+          <TouchableOpacity>
+            <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.loginButton}>
+            <Text style={styles.loginButtonText}>Se connecter</Text>
+          </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+      </View>
+    </ScrollView>
+  );
+};
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'flex-start', // Align content to the top
-        alignItems: 'center',
-        backgroundColor: '#fff',
-        paddingTop: 30, // Add padding at the top of the screen to push the content down
+      flex: 1,
+      backgroundColor: '#fff',
+    },
+    loginContainer: {
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      padding: 20,
+    },
+    loginInfo: {
+      flex: 1,
+      marginRight: 50,
+    },
+    loginInfoTitle: {
+      fontSize: 24,
+      fontWeight: 'bold',
+      marginBottom: 20,
+    },
+    loginInfoText: {
+      fontSize: 16,
+      marginBottom: 20,
+    },
+    linkText: {
+      color: '#3490dc',
+      textDecorationLine: 'underline',
+    },
+    loginFormContainer: {
+      flex: 1,
+      paddingHorizontal: 20,
+      paddingVertical: 30,
     },
     card: {
-        borderRadius: 20,
-        elevation: 5,
-        backgroundColor: '#fff',
-        width: 500, // Adjust the width to match the first image
-        alignSelf: 'flex-end',
-        marginRight: 60,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 20,
-        overflow: 'hidden',
-        marginTop: 20, // Add top margin if needed
+      backgroundColor: '#fff',
+      borderRadius: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      elevation: 3,
     },
     cardHeader: {
-        backgroundColor: '#3490dc',
-        width: '100%',
-        padding: 20,
-        borderTopLeftRadius: 20, 
-        borderTopRightRadius: 20,
+      backgroundColor: '#6AC8FF',
+      borderTopLeftRadius: 20,
+      borderTopRightRadius: 20,
+      padding: 20,
     },
-    headerTitle: {
-        color: '#fff',
-        fontSize: 20,
-        fontWeight: 'bold',
-        textAlign: 'center',
+    cardHeaderText: {
+      color: '#fff',
+      textAlign: 'center',
+      fontSize: 20,
+      fontWeight: 'bold',
     },
     cardBody: {
-        padding: 20,
-        width: '100%', 
-    },
-    welcomeTitle: {
-        fontSize: 24,
-        alignSelf: 'flex-start',
-        fontWeight: 'bold',
-        marginBottom: 10,
-        textAlign: 'center',
-    },
-    welcomeText: {
-        fontSize: 16,
-        alignSelf: 'flex-start',
-        textAlign: 'center',
-        marginBottom: 20,
-    },
-    registerLink: {
-        color: '#3490dc',
-        fontSize: 16,
-        textDecorationLine: 'underline',
+      padding: 20,
     },
     input: {
-        borderRadius: 10,
-        borderWidth: 1,
-        borderColor: '#ced4da',
-        width: '100%', 
-        marginBottom: 20,
-        padding: 15,
+      backgroundColor: '#f8f9fa',
+      borderRadius: 10,
+      padding: 15,
+      marginBottom: 15,
+      borderWidth: 1,
+      borderColor: '#ced4da',
     },
-    buttonPrimary: {
-        backgroundColor: '#3490dc',
-        borderRadius: 20,
-        padding: 15,
-        width: '100%', 
-        alignItems: 'center', 
+    rememberMeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: 15,
     },
-    buttonText: {
-        color: '#fff',
-        fontSize: 16,
+    checkbox: {
+      marginRight: 10,
     },
-    });
-    
-    
-export default LoginForm;
+    rememberMeText: {
+      fontSize: 16,
+    },
+    forgotPasswordText: {
+      color: '#3490dc',
+      textAlign: 'right',
+      marginBottom: 20,
+    },
+    loginButton: {
+      backgroundColor: '#3490dc',
+      borderRadius: 20,
+      padding: 15,
+      alignItems: 'center',
+    },
+    loginButtonText: {
+      color: '#fff',
+      fontSize: 16,
+      fontWeight: 'bold',
+    },
+  });
+  
+export default LoginScreen;
