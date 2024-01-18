@@ -26,8 +26,14 @@ const DashboardScreen = () => {
     const handleMapPress = async (e) => {
         const { latitude, longitude } = e.nativeEvent.coordinate;
         const countryName = await reverseGeocode(latitude, longitude);
-        navigation.navigate('CountryDetails', { countryName });
+        if (countryName) {
+            navigation.navigate('CountryDetails', { countryName });
+        } else {
+            // Gérer le cas où aucun pays n'est trouvé
+            console.log('Aucun pays trouvé à ces coordonnées.');
+        }
     };
+    
     
   return (
     <ScrollView style={styles.container}>
