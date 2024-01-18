@@ -1,26 +1,45 @@
 import React from 'react';
-import { ScrollView, View, Text, TextInput, TouchableOpacity, StyleSheet, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 
-const isWeb = Platform.OS === 'web';
-
-const SignUpScreen = () => {
+const RegisterScreen = () => {
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.container}>
       <View style={styles.card}>
-        <View style={isWeb ? styles.cardHeaderWeb : styles.cardHeaderNative}>
-          <Text style={styles.headerText}>Rejoignez-nous</Text>
+        <View style={styles.cardHeader}>
+          <Text style={styles.cardHeaderTitle}>Rejoignez-nous</Text>
         </View>
         <View style={styles.cardBody}>
-          <TextInput style={styles.input} placeholder="Your name" />
-          <TextInput style={styles.input} placeholder="Your email" />
-          <TextInput style={styles.input} placeholder="Create a password" secureTextEntry />
-          <TextInput style={styles.input} placeholder="Confirm your password" secureTextEntry />
-
-          <TouchableOpacity style={styles.buttonContainer}>
-            <View style={isWeb ? styles.buttonWeb : styles.buttonNative}>
-              <Text style={styles.buttonText}>Sign Up</Text>
-            </View>
+          {/* Formulaire d'inscription */}
+          <TextInput
+            style={styles.input}
+            placeholder="Votre nom complet"
+            autoCapitalize="words"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Votre email"
+            keyboardType="email-address"
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Créez un mot de passe"
+            secureTextEntry
+          />
+          <TextInput
+            style={styles.input}
+            placeholder="Confirmez votre mot de passe"
+            secureTextEntry
+          />
+          <TouchableOpacity style={styles.button}>
+            <Text style={styles.buttonText}>S'inscrire</Text>
           </TouchableOpacity>
+          <View style={styles.alreadyRegistered}>
+            <TouchableOpacity>
+              <Text style={styles.alreadyRegisteredText}>
+                Déjà inscrit ? Connectez-vous
+              </Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -29,65 +48,61 @@ const SignUpScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    flex: 1,
+    backgroundColor: '#fff',
     padding: 20,
   },
   card: {
-    width: '100%',
-    borderRadius: 20,
-    overflow: 'hidden',
     backgroundColor: '#fff',
-    elevation: 5,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  cardHeaderWeb: {
-    paddingVertical: 20,
-    backgroundImage: 'linear-gradient(135deg, #6AC8FF 0%, #3A8DFF 100%)',
+  cardHeader: {
+    backgroundColor: '#6AC8FF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 20,
+    alignItems: 'center',
   },
-  cardHeaderNative: {
-    paddingVertical: 20,
-    // Utilisez ici une méthode alternative pour le gradient si disponible
-  },
-  headerText: {
-    textAlign: 'center',
-    color: '#ffffff',
-    fontSize: 24,
-    fontWeight: 'bold',
+  cardHeaderTitle: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '600',
   },
   cardBody: {
     padding: 20,
   },
   input: {
-    backgroundColor: '#ffffff',
-    borderColor: '#ddd',
-    borderWidth: 1,
+    backgroundColor: '#f8f9fa',
     borderRadius: 10,
-    padding: 10,
-    marginBottom: 10,
-  },
-  buttonContainer: {
-    marginTop: 10,
-  },
-  buttonWeb: {
     padding: 15,
-    borderRadius: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundImage: 'linear-gradient(135deg, #6AC8FF 0%, #3A8DFF 100%)',
+    marginBottom: 15,
+    borderWidth: 1,
+    borderColor: '#ced4da',
   },
-  buttonNative: {
-    padding: 15,
+  button: {
+    backgroundColor: '#3490dc',
     borderRadius: 20,
-    justifyContent: 'center',
+    padding: 15,
     alignItems: 'center',
-    // Utilisez ici une méthode alternative pour le gradient si disponible
+    marginBottom: 15,
   },
   buttonText: {
-    color: '#ffffff',
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
   },
+  alreadyRegistered: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  alreadyRegisteredText: {
+    color: '#3490dc',
+  },
 });
 
-export default SignUpScreen;
+export default RegisterScreen;

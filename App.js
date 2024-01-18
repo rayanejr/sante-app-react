@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from './screens/Login';
 import Welcome from './screens/Welcome';
 import Register from './screens/Register';
+import Dashboard from './screens/Dashboard'; // Ajoutez cette ligne
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 
 const Stack = createNativeStackNavigator();
@@ -51,6 +52,17 @@ const App = () => {
           component={Register}
           options={({ navigation }) => headerOptions(navigation)}
         />
+        <Stack.Screen 
+          name="Dashboard" 
+          component={Dashboard}  // Ajoutez cette ligne
+          options={({ navigation }) => headerOptions(navigation)}
+        />
+        <Stack.Screen 
+          name="CountryDetailsScreen" 
+          component={CountryDetailsScreen}
+          options={({ navigation }) => headerOptions(navigation)}
+        />
+
       </Stack.Navigator>
     </NavigationContainer>
   );
