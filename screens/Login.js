@@ -58,25 +58,26 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 20,
-  },
-  loginContainer: {
-    flexDirection: 'row',
+    padding: 10, // Réduction du padding pour les petits écrans
+  },loginContainer: {
+    flexDirection: 'column', // Utilisation d'un stack layout sur mobile
     justifyContent: 'center',
     alignItems: 'center',
   },
   loginInfo: {
-    marginRight: 50,
+    margin: 10, // Réduction de la marge
     flex: 1,
+    alignItems: 'center', // Centrage du texte sur mobile
   },
   loginInfoTitle: {
-    fontSize: 24,
+    fontSize: 20, // Réduction de la taille de la police pour les petits écrans
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginBottom: 10, // Réduction de l'espacement
   },
   loginInfoText: {
-    fontSize: 16,
-    marginBottom: 20,
+    fontSize: 14, // Taille de police adaptée pour mobile
+    marginBottom: 10,
+    textAlign: 'center', // Centrage du texte sur mobile
   },
   linkText: {
     color: '#3490dc',
@@ -84,46 +85,45 @@ const styles = StyleSheet.create({
   },
   loginForm: {
     flex: 1,
+    width: '100%',
   },
   card: {
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
+    borderRadius: 15, // Réduction du rayon de bordure pour un look plus adapté au mobile
     shadowOpacity: 0.1,
-    shadowRadius: 6,
+    shadowRadius: 4,
     overflow: 'hidden',
+    margin: 10, // Ajout d'une marge autour de la carte
   },
   cardHeader: {
     backgroundColor: '#6AC8FF',
-    padding: 20,
+    padding: 15, // Réduction du padding
   },
   cardHeaderText: {
     color: '#fff',
     textAlign: 'center',
-    fontSize: 20,
-    fontWeight: 'bold',
+    fontSize: 18, // Réduction de la taille de la police pour les petits écrans
   },
   cardBody: {
     backgroundColor: '#fff',
-    padding: 40,
+    padding: 20, // Réduction du padding pour les petits écrans
   },
   input: {
     borderWidth: 1,
     borderColor: '#ced4da',
     borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-    fontSize: 16,
+    padding: 12, // Réduction du padding
+    marginBottom: 15,
+    fontSize: 14, // Réduction de la taille de la police
   },
   button: {
     backgroundColor: '#3490dc',
     borderRadius: 20,
-    padding: 15,
+    padding: 12, // Réduction du padding
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14, // Réduction de la taille de la police
   }
 });
 
