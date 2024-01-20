@@ -1,23 +1,25 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
-import MapView from 'react-native-maps'; // Assurez-vous d'installer react-native-maps
+import MapView from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 
 async function reverseGeocode(latitude, longitude) {
     try {
-      const response = await fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=AIzaSyBSM5VbWM1Lv8S1HZWexpYbZKW5aBpk7qw`);
-      const responseJson = await response.json();
-      if (responseJson.results[0]) {
-        const addressComponents = responseJson.results[0].address_components;
-        const countryComponent = addressComponents.find(component => component.types.includes('country'));
-        return countryComponent ? countryComponent.long_name : null;
-      }
-      return null;
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`;
+        const response = await fetch(url);
+        const responseJson = await response.json();
+
+        if (responseJson.error) {
+            console.log("Erreur de géocodage inversé : ", responseJson.error);
+            return null;
+        }
+
+        return responseJson.address.country;
     } catch (error) {
-      console.error(error);
-      return null;
+        console.error("Erreur lors de la requête de géocodage inversé : ", error);
+        return null;
     }
-  }
+} 
   
 
 const DashboardScreen = () => {
@@ -26,14 +28,13 @@ const DashboardScreen = () => {
     const handleMapPress = async (e) => {
         const { latitude, longitude } = e.nativeEvent.coordinate;
         const countryName = await reverseGeocode(latitude, longitude);
+
         if (countryName) {
             navigation.navigate('CountryDetails', { countryName });
         } else {
-            // Gérer le cas où aucun pays n'est trouvé
-            console.log('Aucun pays trouvé à ces coordonnées.');
+            console.log("Aucun pays trouvé à ces coordonnées.");
         }
-    };
-    
+    };  
     
   return (
     <ScrollView style={styles.container}>
@@ -48,14 +49,14 @@ const DashboardScreen = () => {
           </Text>
           {/* Carte (Exemple simple) */}
           <MapView
-            style={styles.map}
-            initialRegion={{
-                latitude: 37.78825,
-                longitude: -122.4324,
-                latitudeDelta: 0.0922,
-                longitudeDelta: 0.0421,
-            }}
-            onPress={handleMapPress}
+                style={styles.map}
+                initialRegion={{
+                    latitude: 37.78825,
+                    longitude: -122.4324,
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+                onPress={handleMapPress}
             />
         </View>
       </View>

@@ -1,122 +1,144 @@
-// import React, { useState, useEffect } from 'react';
-// import { NavigationContainer } from '@react-navigation/native';
-// import { createNativeStackNavigator } from '@react-navigation/native-stack';
-// import AsyncStorage from '@react-native-async-storage/async-storage';
-// import Login from './screens/Login';
-// import Welcome from './screens/Welcome';
-// import Register from './screens/Register';
-// import Dashboard from './screens/Dashboard';
-// import CountryDetails from './screens/CountryDetails';
-// import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-
-// const Stack = createNativeStackNavigator();
-
-// const App = () => {
-//   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-//   useEffect(() => {
-//     // Ici, insérez votre logique pour vérifier si l'utilisateur est connecté
-//     // Par exemple, vérifier un token stocké localement
-//     const checkLoginStatus = async () => {
-//       try {
-//         const token = await AsyncStorage.getItem('userToken');
-//         setIsLoggedIn(token != null);
-//       } catch (e) {
-//         console.error(e);
-//       }
-//     };
-
-//     checkLoginStatus();
-//   }, []);
-
-//   const headerOptions = ({ navigation }) => ({
-//     headerTitle: () => (
-//       <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
-//         <Text style={styles.headerTitle}>Sante-APP</Text>
-//       </TouchableOpacity>
-//     ),
-//     headerStyle: {
-//       backgroundColor: '#ffffff',
-//     },
-//     headerTitleStyle: {
-//       fontWeight: 'bold',
-//     },
-//     headerRight: () => (
-//       <View style={styles.headerSideButtons}>
-//         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-//           <Text style={styles.headerButton}>Login</Text>
-//         </TouchableOpacity>
-//         <TouchableOpacity onPress={() => navigation.navigate('Register')}>
-//           <Text style={styles.headerButton}>Register</Text>
-//         </TouchableOpacity>
-//       </View>
-//     ),
-//   });
-
-//   return (
-//     <NavigationContainer>
-//       <Stack.Navigator>
-//         {isLoggedIn ? (
-//           <>
-//             <Stack.Screen name="Dashboard" component={Dashboard} options={headerOptions} />
-//             <Stack.Screen name="CountryDetails" component={CountryDetails} options={headerOptions} />
-//           </>
-//         ) : (
-//           <>
-//             <Stack.Screen name="Welcome" component={Welcome} options={headerOptions} />
-//             <Stack.Screen name="Login" component={Login} options={headerOptions} />
-//             <Stack.Screen name="Register" component={Register} options={headerOptions} />
-//           </>
-//         )}
-//       </Stack.Navigator>
-//     </NavigationContainer>
-//   );
-// };
-
-// const styles = StyleSheet.create({
-//   headerSideButtons: {
-//     flexDirection: 'row',
-//     marginRight: 10,
-//   },
-//   headerButton: {
-//     color: '#000',
-//     paddingHorizontal: 10,
-//     fontSize: 18,
-//   },
-//   headerTitle: {
-//     color: '#000',
-//     fontSize: 18,
-//     fontWeight: 'bold',
-//   },
-// });
-
-// export default App;
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { View, Image, TouchableOpacity, Button, StyleSheet } from 'react-native';
 import Dashboard from './screens/Dashboard';
 import CountryDetails from './screens/CountryDetails';
+import Login from './screens/Login';
+import Register from './screens/Register';
+import Welcome from './screens/Welcome';
+import ConfirmPassword from './screens/ConfirmPassword'; 
+import ForgotPassword from './screens/ForgotPassword';
+import ResetPassword from './screens/ResetPassword';
+import EmailVerification from './screens/EmailVerification';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
+
+  const headerRightButtons = (navigation) => {
+    return isLoggedIn ? (
+      <View style={styles.rightHeaderButtons}>
+        <Button title="Dashboard" onPress={() => navigation.navigate('Dashboard')} />
+        <Button title="Déconnexion" onPress={() => setIsLoggedIn(false)} />
+        <Button title="ConfirmPassword" onPress={() => navigation.navigate('ConfirmPassword')} />
+        <Button title="EmailVerification" onPress={() => navigation.navigate('EmailVerification')} />
+        
+      </View>
+    ) : (
+      <View style={styles.rightHeaderButtons}>
+        <Button title="Connexion" onPress={() => navigation.navigate('Login')} />
+        <Button title="Inscription" onPress={() => navigation.navigate('Register')} />
+        <Button title="ForgotPassword" onPress={() => navigation.navigate('ForgotPassword')} />
+        <Button title="ResetPassword" onPress={() => navigation.navigate('ResetPassword')} />
+      </View>
+    );
+  };
+
+  const logoHeader = (navigation) => (
+    <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
+      <Image 
+        source={require('./assets/logo.png')}
+        style={styles.logo}
+      />
+    </TouchableOpacity>
+  );
+
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Dashboard">
+      <Stack.Navigator>
         <Stack.Screen 
-          name="Dashboard" 
-          component={Dashboard} 
-          options={{ title: 'Tableau de Bord' }}
+          name="Welcome" 
+          component={Welcome} 
+          options={({ navigation }) => ({
+            headerTitle: () => logoHeader(navigation),
+            headerRight: () => headerRightButtons(navigation)
+          })}
         />
-        <Stack.Screen 
-          name="CountryDetails" 
-          component={CountryDetails} 
-          options={{ title: 'Détails du Pays' }}
-        />
+        {isLoggedIn ? (
+          <>
+            <Stack.Screen 
+              name="Dashboard" 
+              component={Dashboard} 
+              options={({ navigation }) => ({
+                headerTitle: () => logoHeader(navigation),
+                headerRight: () => headerRightButtons(navigation)
+              })}
+            />
+            <Stack.Screen 
+              name="CountryDetails" 
+              component={CountryDetails} 
+              options={({ navigation }) => ({
+                headerTitle: () => logoHeader(navigation),
+                headerRight: () => headerRightButtons(navigation)
+              })}
+            />
+            <Stack.Screen 
+              name="ConfirmPassword" 
+              component={ConfirmPassword} 
+              options={({ navigation }) => ({
+                headerTitle: () => logoHeader(navigation),
+                headerRight: () => headerRightButtons(navigation)
+              })}
+            />
+            <Stack.Screen 
+              name="EmailVerification" 
+              component={EmailVerification} 
+              options={({ navigation }) => ({
+                headerTitle: () => logoHeader(navigation),
+                headerRight: () => headerRightButtons(navigation)
+              })}
+            />
+
+            
+          </>
+        ) : (
+          <>
+            <Stack.Screen 
+              name="Login" 
+              component={Login} 
+              options={({ navigation }) => ({
+                headerTitle: () => logoHeader(navigation),
+                headerRight: () => headerRightButtons(navigation)
+              })}
+            />
+            <Stack.Screen 
+              name="Register" 
+              component={Register} 
+              options={({ navigation }) => ({
+                headerTitle: () => logoHeader(navigation),
+                headerRight: () => headerRightButtons(navigation)
+              })}
+            />
+            <Stack.Screen 
+              name="ForgotPassword" 
+              component={ForgotPassword} 
+              options={{ title: 'Réinitialisation du Mot de Passe' }}
+            />
+
+            <Stack.Screen
+              name="ResetPassword"
+              component={ResetPassword}
+              options={{ title: 'Réinitialisation du Mot de Passe' }}
+            />
+          </>
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );
 };
 
-export default App;
+const styles = StyleSheet.create({
+  logo: {
+    width: 100,
+    height: 40,
+    resizeMode: 'contain'
+  },
+  rightHeaderButtons: {
+    flexDirection: 'row',
+    marginRight: 10,
+  }
+});
 
+export default App;
