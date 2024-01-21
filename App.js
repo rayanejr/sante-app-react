@@ -11,6 +11,7 @@ import ConfirmPassword from './screens/ConfirmPassword';
 import ForgotPassword from './screens/ForgotPassword';
 import ResetPassword from './screens/ResetPassword';
 import EmailVerification from './screens/EmailVerification';
+import Admin from './screens/Admin';
 
 const Stack = createNativeStackNavigator();
 
@@ -20,6 +21,7 @@ const App = () => {
   const headerRightButtons = (navigation) => {
     return isLoggedIn ? (
       <View style={styles.rightHeaderButtons}>
+        <Button title="Admin" onPress={() => navigation.navigate('Admin')} />
         <Button title="Dashboard" onPress={() => navigation.navigate('Dashboard')} />
         <Button title="Déconnexion" onPress={() => setIsLoggedIn(false)} />
         <Button title="ConfirmPassword" onPress={() => navigation.navigate('ConfirmPassword')} />
@@ -47,7 +49,15 @@ const App = () => {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator>
+        <Stack.Navigator>
+          <Stack.Screen
+          name="Admin"
+          component={Admin}
+          options={({ navigation }) => ({
+            headerTitle: () => logoHeader(navigation),
+            headerRight: () => headerRightButtons(navigation)
+          })}
+        />
         <Stack.Screen 
           name="Welcome" 
           component={Welcome} 
