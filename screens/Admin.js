@@ -1,6 +1,6 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from 'react-native';
+const windowWidth = Dimensions.get('window').width;
 const AdminScreen = () => {
   // Remplacer par la navigation réelle et les fonctions de gestion des clics
   const navigate = (route) => {
@@ -10,7 +10,7 @@ const AdminScreen = () => {
   return (
     <View style={styles.wrapper}>
       {/* Sidebar */}
-      <View style={styles.sidebarWrapper}>
+      <View style={[styles.sidebarWrapper, windowWidth < 768 ? styles.sidebarWrapperSmall : null]}>
         <Text style={styles.sidebarHeading}>Sante-APP</Text>
         <TouchableOpacity onPress={() => navigate('Dashboard')} style={styles.listGroupItem}>
           <Text style={styles.listGroupItemText}>Dashboard</Text>
@@ -30,8 +30,8 @@ const AdminScreen = () => {
       </View>
 
       {/* Main Content */}
-      <ScrollView style={styles.pageContentWrapper}>
-        <View style={styles.container}>
+      <ScrollView style={[styles.pageContentWrapper, windowWidth < 768 ? styles.pageContentWrapperSmall : null]}>
+        <View style={[styles.container, windowWidth < 768 ? styles.containerSmall : null]}>
           <Text style={styles.heading}>Tableau de Bord</Text>
           <View style={styles.card}>
             <View style={styles.cardHeader}>
@@ -72,6 +72,9 @@ const styles = StyleSheet.create({
     width: 250,
     backgroundColor: '#3490dc',
   },
+  sidebarWrapperSmall: {
+    width: 150, // Réduire la largeur pour les petits écrans
+  },
   sidebarHeading: {
     textAlign: 'center',
     color: 'white',
@@ -89,8 +92,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8f9fa',
     padding: 20,
   },
+  pageContentWrapperSmall: {
+    padding: 10, // Réduire le padding pour les petits écrans
+  },
   container: {
     maxWidth: 1200,
+  },
+  containerSmall: {
+    maxWidth: '100%', // Utiliser toute la largeur pour les petits écrans
   },
   heading: {
     fontSize: 24,
