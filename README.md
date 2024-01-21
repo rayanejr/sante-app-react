@@ -37,12 +37,24 @@ Pour exécuter Santé-APP sur votre système local, suivez ces étapes :
 ```bash
     npm install
 ```  
-`npm install @react-navigation/native` 
-`npm install @react-navigation/stack` 
-`npm install @react-native-maps`
-`react-native-vector-icons` et `@expo/vector-icons`
-`npm install axios` 
-`npx expo install react-native-web@~0.19.6 react-dom@18.2.0 @expo/webpack-config@^19.0.0`
+```bash
+npm install @react-navigation/native
+```
+```bash
+npm install @react-navigation/stack
+```  
+```bash
+npm install @react-native-maps
+``` 
+```bash
+react-native-vector-icons` et `@expo/vector-icons
+``` 
+```bash
+npm install axios
+``` 
+```bash
+npx expo install react-native-web@~0.19.6 react-dom@18.2.0 @expo/webpack-config@^19.0.0
+``` 
 
 3. **Lancez l'application** :
 ```bash
