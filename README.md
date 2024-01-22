@@ -54,7 +54,10 @@ npm install axios
 ``` 
 ```bash
 npx expo install react-native-web@~0.19.6 react-dom@18.2.0 @expo/webpack-config@^19.0.0
-``` 
+```
+```bash 
+npm install leaflet react-leaflet
+```
 
 3. **Lancez l'application** :
 ```bash
