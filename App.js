@@ -2,31 +2,42 @@ import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Image, TouchableOpacity, Button, StyleSheet } from 'react-native';
+
+// Import des écrans
 import Dashboard from './screens/Dashboard';
 import CountryDetails from './screens/CountryDetails';
 import Login from './screens/Login';
 import Register from './screens/Register';
 import Welcome from './screens/Welcome';
-import ConfirmPassword from './screens/ConfirmPassword'; 
+import ConfirmPassword from './screens/ConfirmPassword';
 import ForgotPassword from './screens/ForgotPassword';
 import ResetPassword from './screens/ResetPassword';
 import EmailVerification from './screens/EmailVerification';
+import UserList from './screens/UserList';
 import Admin from './screens/Admin';
+import EditUserScreen from './screens/EditUser';
+import AddUserScreen from './screens/AddUser';
+import RecommandationListScreen from './screens/RecommandationList';
+import AddRecommandationScreen from './screens/AddRecommandation';
+import EditRecommandationScreen from './screens/EditRecommandation';
 
 const Stack = createNativeStackNavigator();
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
 
-  const headerRightButtons = (navigation) => {
+  const HeaderRightButtons = ({ navigation }) => {
     return isLoggedIn ? (
       <View style={styles.rightHeaderButtons}>
         <Button title="Admin" onPress={() => navigation.navigate('Admin')} />
+        <Button title="UserList" onPress={() => navigation.navigate('UserList')} />
+        <Button title="AddUser" onPress={() => navigation.navigate('AddUser')} />
+        <Button title="EditUser" onPress={() => navigation.navigate('EditUser')} />
         <Button title="Dashboard" onPress={() => navigation.navigate('Dashboard')} />
+        <Button title="RecommandationList" onPress={() => navigation.navigate('RecommandationList')} />
+        <Button title="AddRecommandation" onPress={() => navigation.navigate('AddRecommandation')} />
+        <Button title="EditRecommandation" onPress={() => navigation.navigate('EditRecommandation')} />
         <Button title="Déconnexion" onPress={() => setIsLoggedIn(false)} />
-        <Button title="ConfirmPassword" onPress={() => navigation.navigate('ConfirmPassword')} />
-        <Button title="EmailVerification" onPress={() => navigation.navigate('EmailVerification')} />
-        
       </View>
     ) : (
       <View style={styles.rightHeaderButtons}>
@@ -38,7 +49,7 @@ const App = () => {
     );
   };
 
-  const logoHeader = (navigation) => (
+  const LogoHeader = ({ navigation }) => (
     <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
       <Image 
         source={require('./assets/logo.png')}
@@ -49,91 +60,29 @@ const App = () => {
 
   return (
     <NavigationContainer>
-        <Stack.Navigator>
-          <Stack.Screen
-          name="Admin"
-          component={Admin}
-          options={({ navigation }) => ({
-            headerTitle: () => logoHeader(navigation),
-            headerRight: () => headerRightButtons(navigation)
-          })}
-        />
+      <Stack.Navigator>
         <Stack.Screen 
           name="Welcome" 
           component={Welcome} 
           options={({ navigation }) => ({
-            headerTitle: () => logoHeader(navigation),
-            headerRight: () => headerRightButtons(navigation)
+            headerTitle: () => <LogoHeader navigation={navigation} />,
+            headerRight: () => <HeaderRightButtons navigation={navigation} />
           })}
         />
-        {isLoggedIn ? (
-          <>
-            <Stack.Screen 
-              name="Dashboard" 
-              component={Dashboard} 
-              options={({ navigation }) => ({
-                headerTitle: () => logoHeader(navigation),
-                headerRight: () => headerRightButtons(navigation)
-              })}
-            />
-            <Stack.Screen 
-              name="CountryDetails" 
-              component={CountryDetails} 
-              options={({ navigation }) => ({
-                headerTitle: () => logoHeader(navigation),
-                headerRight: () => headerRightButtons(navigation)
-              })}
-            />
-            <Stack.Screen 
-              name="ConfirmPassword" 
-              component={ConfirmPassword} 
-              options={({ navigation }) => ({
-                headerTitle: () => logoHeader(navigation),
-                headerRight: () => headerRightButtons(navigation)
-              })}
-            />
-            <Stack.Screen 
-              name="EmailVerification" 
-              component={EmailVerification} 
-              options={({ navigation }) => ({
-                headerTitle: () => logoHeader(navigation),
-                headerRight: () => headerRightButtons(navigation)
-              })}
-            />
-
-            
-          </>
-        ) : (
-          <>
-            <Stack.Screen 
-              name="Login" 
-              component={Login} 
-              options={({ navigation }) => ({
-                headerTitle: () => logoHeader(navigation),
-                headerRight: () => headerRightButtons(navigation)
-              })}
-            />
-            <Stack.Screen 
-              name="Register" 
-              component={Register} 
-              options={({ navigation }) => ({
-                headerTitle: () => logoHeader(navigation),
-                headerRight: () => headerRightButtons(navigation)
-              })}
-            />
-            <Stack.Screen 
-              name="ForgotPassword" 
-              component={ForgotPassword} 
-              options={{ title: 'Réinitialisation du Mot de Passe' }}
-            />
-
-            <Stack.Screen
-              name="ResetPassword"
-              component={ResetPassword}
-              options={{ title: 'Réinitialisation du Mot de Passe' }}
-            />
-          </>
-        )}
+        <Stack.Screen name="Admin" component={Admin} />
+        <Stack.Screen name="UserList" component={UserList} />
+        <Stack.Screen name="AddUser" component={AddUserScreen} />
+        <Stack.Screen name="EditUser" component={EditUserScreen} />
+        <Stack.Screen name="CountryDetails" component={CountryDetails} />
+        <Stack.Screen name="Dashboard" component={Dashboard} />
+        <Stack.Screen name="RecommandationList" component={RecommandationListScreen} />
+        <Stack.Screen name="AddRecommandation" component={AddRecommandationScreen} />
+        <Stack.Screen name="EditRecommandation" component={EditRecommandationScreen} />
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="Register" component={Register} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen name="ResetPassword" component={ResetPassword} />
+        {/* Autres écrans ici... */}
       </Stack.Navigator>
     </NavigationContainer>
   );
