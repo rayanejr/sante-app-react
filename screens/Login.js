@@ -1,12 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useNavigation } from '@react-navigation/native'; // Importez useNavigation depuis React Navigation
 
 const LoginScreen = () => {
+  const navigation = useNavigation(); // Obtenez l'objet de navigation
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
   const handleLogin = () => {
     // Logique de connexion
+  };
+
+  const handleRegisterPress = () => {
+    // Redirigez l'utilisateur vers la page d'inscription
+    navigation.navigate('Register'); // Assurez-vous que 'Register' correspond à la clé de votre route d'inscription
   };
 
   return (
@@ -19,7 +27,7 @@ const LoginScreen = () => {
             de gérer vos rendez-vous et de rester au courant de vos besoins médicaux en toute simplicité.
           </Text>
           <Text style={styles.loginInfoText}>
-            Vous n'avez pas de compte ? <Text style={styles.linkText}>Inscrivez-vous maintenant</Text>
+            Vous n'avez pas de compte ? <Text style={styles.linkText} onPress={handleRegisterPress}>Inscrivez-vous maintenant</Text>
           </Text>
         </View>
 
@@ -59,7 +67,8 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
     padding: 10, // Réduction du padding pour les petits écrans
-  },loginContainer: {
+  },
+  loginContainer: {
     flexDirection: 'column', // Utilisation d'un stack layout sur mobile
     justifyContent: 'center',
     alignItems: 'center',
@@ -124,7 +133,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 14, // Réduction de la taille de la police
-  }
+  },
 });
 
 export default LoginScreen;

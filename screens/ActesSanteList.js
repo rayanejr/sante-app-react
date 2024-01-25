@@ -1,48 +1,50 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-const recommandations = [
-  { id: 1, titre: 'Titre Recommandation 1', contenu: 'Contenu Recommandation 1' },
-  // ... autres recommandations
-];
-
-const RecommandationListScreen = () => {
+const ActesSanteListScreen = () => {
   const navigation = useNavigation();
+  const [healthActs, setHealthActs] = useState([
+    { id: 1, nom: 'Acte de Santé 1', description: 'Description 1', prix: 100, pays: 'France' },
+    { id: 2, nom: 'Acte de Santé 2', description: 'Description 2', prix: 200, pays: 'Allemagne' },
+    // ... autres actes de santé ...
+  ]);
 
-  const navigateToAddRecommandation = () => {
-    navigation.navigate('AddRecommandation');
+  const navigateToAddActeSante = () => {
+    navigation.navigate('AddActesSante'); // Assurez-vous que 'AddActesSante' est le nom correct de l'écran dans votre Navigator
   };
-
   const handleEdit = (id) => {
-    navigation.navigate('EditRecommandation', { recommandationId: id });
+    // Naviguer vers l'écran EditActesSante avec l'ID de l'acte de santé
+    navigation.navigate('EditActesSante', { acteSanteId: id });
   };
-
   const handleDelete = (id) => {
-    console.log(`Supprimer la recommandation avec l'id: ${id}`);
+    // Supprimer l'acte de santé avec l'ID spécifié
+    setHealthActs(healthActs.filter(acte => acte.id!== id));
   };
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerText}>Recommandations</Text>
-        <TouchableOpacity style={styles.addButton} onPress={navigateToAddRecommandation}>
-          <Text style={styles.addButtonText}>Ajouter une recommandation</Text>
+        <Text style={styles.headerText}>Actes de Santé</Text>
+        <TouchableOpacity style={styles.addButton} onPress={navigateToAddActeSante}>
+          <Text style={styles.addButtonText}>Ajouter un acte de santé</Text>
         </TouchableOpacity>
       </View>
       <View style={styles.content}>
-        {recommandations.map(recommandation => (
-          <View key={recommandation.id} style={styles.card}>
+        {healthActs.map((acte) => (
+          <View key={acte.id} style={styles.card}>
             <View style={styles.cardHeader}>
-              <Text style={styles.cardHeaderText}>{recommandation.titre}</Text>
+              <Text style={styles.cardHeaderText}>{acte.nom}</Text>
             </View>
             <View style={styles.cardBody}>
-              <Text>{recommandation.contenu}</Text>
+              <Text>Description: {acte.description}</Text>
+              <Text>Prix: {acte.prix}€</Text>
+              <Text>Pays: {acte.pays}</Text>
               <View style={styles.actions}>
-                <TouchableOpacity style={styles.actionButton} onPress={() => handleEdit(recommandation.id)}>
+                <TouchableOpacity style={styles.actionButton} onPress={() => handleEdit(acte.id)}>
                   <Text style={styles.actionButtonText}>Modifier</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.actionButton, styles.actionButtonDanger]} onPress={() => handleDelete(recommandation.id)}>
+                <TouchableOpacity style={[styles.actionButton, styles.actionButtonDanger]} onPress={() => handleDelete(acte.id)}>
                   <Text style={styles.actionButtonText}>Supprimer</Text>
                 </TouchableOpacity>
               </View>
@@ -59,26 +61,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
   },
-  
   header: {
     padding: 20,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexWrap: 'wrap', // Permet au contenu de l'en-tête de passer à la ligne suivante si nécessaire
+    flexDirection: 'row', // Permet d'aligner le titre et le bouton sur la même ligne
+    justifyContent: 'space-between', // Répartit uniformément l'espace
+    alignItems: 'center', // Alignement vertical des éléments
   },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
-    flex: 1, // Permet au texte de s'adapter à l'espace disponible
-    marginRight: 10, // Assure un espace entre le texte et le bouton
   },
   addButton: {
     backgroundColor: '#4CAF50',
     padding: 10,
     borderRadius: 5,
-    alignSelf: 'flex-start', // Alignement du bouton en haut
   },
   addButtonText: {
     color: 'white',
@@ -128,4 +125,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default RecommandationListScreen;
+export default ActesSanteListScreen;

@@ -1,7 +1,10 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+
 
 const RegisterScreen = () => {
+  const navigation = useNavigation();
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
@@ -34,11 +37,9 @@ const RegisterScreen = () => {
             <Text style={styles.buttonText}>S'inscrire</Text>
           </TouchableOpacity>
           <View style={styles.alreadyRegistered}>
-            <TouchableOpacity>
-              <Text style={styles.alreadyRegisteredText}>
-                Déjà inscrit ? Connectez-vous
-              </Text>
-            </TouchableOpacity>
+          <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            <Text style={styles.alreadyRegisteredText}>Déjà inscrit ? Connectez-vous</Text>
+          </TouchableOpacity>
           </View>
         </View>
       </View>

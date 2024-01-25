@@ -11,122 +11,88 @@ const EditRecommandationScreen = () => {
   const [contenu, setContenu] = useState('Contenu initial');
 
   const handleUpdate = () => {
-    // Logique de mise à jour de la recommandation
     console.log('Mettre à jour la recommandation');
   };
 
   return (
-    <View style={styles.wrapper}>
-      {/* Sidebar */}
-      <View style={[styles.sidebarWrapper, windowWidth < 768 ? styles.sidebarWrapperSmall : null]}>
-        <Text style={styles.sidebarHeading}>Sante-APP</Text>
-        {/* Ajoutez ici d'autres éléments de navigation de la sidebar */}
+    <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Modifier la Recommandation</Text>
       </View>
-
-      {/* Page Content */}
-      <ScrollView style={[styles.pageContentWrapper, windowWidth < 768 ? styles.pageContentWrapperSmall : null]}>
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <Text style={styles.cardHeaderText}>Modifier la Recommandation</Text>
-          </View>
-          <View style={styles.cardBody}>
-            <TextInput 
-              style={styles.input} 
-              value={titre} 
-              onChangeText={setTitre} 
-              placeholder="Titre"
-            />
-            <TextInput 
-              style={[styles.input, styles.textArea]} 
-              value={contenu} 
-              onChangeText={setContenu} 
-              placeholder="Contenu"
-              multiline={true}
-              numberOfLines={4}
-            />
-            <TouchableOpacity style={styles.button} onPress={handleUpdate}>
-              <Text style={styles.buttonText}>Mettre à jour</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </View>
+      <View style={styles.form}>
+        <Text style={styles.label}>Titre</Text>
+        <TextInput
+          style={styles.input}
+          value={titre}
+          onChangeText={setTitre}
+          placeholder="Titre de la recommandation"
+        />
+        <Text style={styles.label}>Contenu</Text>
+        <TextInput
+          style={[styles.input, styles.textArea]}
+          value={contenu}
+          onChangeText={setContenu}
+          placeholder="Contenu de la recommandation"
+          multiline
+        />
+        <TouchableOpacity style={styles.button} onPress={handleUpdate}>
+          <Text style={styles.buttonText}>Mettre à jour</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 };
 
-// Styles
 const styles = StyleSheet.create({
-  wrapper: {
+  container: {
     flex: 1,
-    flexDirection: 'row',
-  },
-  sidebarWrapper: {
-    width: 250,
-    backgroundColor: '#3490dc',
     padding: 20,
-  },
-  sidebarWrapperSmall: {
-    width: 100, // Taille réduite pour les petits écrans
-  },
-  sidebarHeading: {
-    color: 'white',
-    fontSize: 24,
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  pageContentWrapper: {
-    flex: 1,
     backgroundColor: '#f8f9fa',
-    padding: 20,
   },
-  pageContentWrapperSmall: {
-    padding: 10, // Réduction du padding pour les petits écrans
-  },
-  card: {
-    borderRadius: 20,
-    backgroundColor: '#fff',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
+  header: {
     marginBottom: 20,
   },
-  cardHeader: {
-    backgroundColor: '#6AC8FF',
-    padding: 20,
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-  },
-  cardHeaderText: {
-    fontSize: 20,
-    color: '#fff',
+  headerText: {
+    fontSize: 24,
     fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
   },
-  cardBody: {
+  form: {
+    backgroundColor: 'white',
+    borderRadius: 20,
     padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 5,
   },
   input: {
     borderWidth: 1,
     borderColor: '#ced4da',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
+    borderRadius: 5,
+    padding: 10,
+    marginBottom: 15,
     fontSize: 16,
   },
   textArea: {
-    height: 100, // Hauteur plus importante pour le champ de texte multiligne
+    minHeight: 100,
   },
   button: {
     backgroundColor: '#3490dc',
-    borderRadius: 20,
-    padding: 15,
+    padding: 10,
+    borderRadius: 5,
     alignItems: 'center',
+    marginTop: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: 'white',
     fontSize: 16,
-  }
+  },
 });
 
 export default EditRecommandationScreen;
