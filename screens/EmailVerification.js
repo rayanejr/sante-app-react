@@ -3,6 +3,29 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-nati
 
 const EmailVerificationScreen = () => {
   // Logique pour la vérification de l'email et la déconnexion
+  const resendVerificationEmail = async () => {
+    try {
+        const token = await AsyncStorage.getItem('userToken'); // Remplacez par votre méthode d'authentification
+        const response = await fetch('http://192.168.1.36:8888/api/email/resend', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`,
+            },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            // Afficher un message de succès
+        } else {
+            // Gérer les erreurs
+        }
+    } catch (error) {
+        // Gérer les erreurs de réseau
+    }
+  } 
+
 
   return (
     <ScrollView style={styles.container}>
@@ -16,7 +39,7 @@ const EmailVerificationScreen = () => {
           </Text>
           {/* Afficher le message de statut ici */}
           <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.buttonPrimary}>
+            <TouchableOpacity style={styles.buttonPrimary} onPress={resendVerificationEmail}>
               <Text style={styles.buttonText}>Renvoyer l'E-mail de Vérification</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.buttonLogout}>

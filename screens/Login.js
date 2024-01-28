@@ -1,20 +1,63 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Importez useNavigation depuis React Navigation
+import { useNavigation } from '@react-navigation/native'; 
 
 const LoginScreen = () => {
-  const navigation = useNavigation(); // Obtenez l'objet de navigation
+  const navigation = useNavigation(); 
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [ userId,setUserId ] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleLogin = () => {
-    // Logique de connexion
-  };
 
   const handleRegisterPress = () => {
-    // Redirigez l'utilisateur vers la page d'inscription
-    navigation.navigate('Register'); // Assurez-vous que 'Register' correspond à la clé de votre route d'inscription
+    navigation.navigate('Register'); 
+  };
+
+
+  const storeUserId = async (userId) => {
+    try {
+      await AsyncStorage.setItem('userId', userId.toString());
+    } catch (error) {
+      console.error('Erreur lors du stockage de l\'ID de l\'utilisateur:', error);
+    }
+  };
+    
+  const handleLogin = async () => {
+    try {
+      const response = await fetch('http://172.20.10.2:8888/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+          password: password,
+        }),
+      });
+      const data = await response.json();
+      
+      setUserId(data.id); 
+
+      if (response.status === 200) {
+        // Vérifier si l'utilisateur est un administrateur
+        if (data.is_admin) {
+          // Naviguer vers le tableau de bord administrateur
+          navigation.navigate('AdminDashboard');
+        } else {
+          // Naviguer vers le tableau de bord utilisateur standard
+          storeUserId(userId);
+          navigation.navigate('UserDashboard');
+        }
+      } else {
+        // Si le statut n'est pas 200, on suppose qu'il y a une erreur de connexion
+        setErrorMessage(data.message || 'Erreur de connexion');
+      }
+    } catch (error) {
+      // Cette partie attrape les erreurs de réseau ou les erreurs survenues lors de la requête
+      setErrorMessage(error.message || 'Une erreur est survenue lors de la connexion');
+    }
   };
 
   return (
@@ -37,6 +80,7 @@ const LoginScreen = () => {
               <Text style={styles.cardHeaderText}>Connectez-vous à votre compte</Text>
             </View>
             <View style={styles.cardBody}>
+              {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
               <TextInput
                 style={styles.input}
                 onChangeText={setEmail}
@@ -66,27 +110,27 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 10, // Réduction du padding pour les petits écrans
+    padding: 10, 
   },
   loginContainer: {
-    flexDirection: 'column', // Utilisation d'un stack layout sur mobile
+    flexDirection: 'column', 
     justifyContent: 'center',
     alignItems: 'center',
   },
   loginInfo: {
-    margin: 10, // Réduction de la marge
+    margin: 10, 
     flex: 1,
-    alignItems: 'center', // Centrage du texte sur mobile
+    alignItems: 'center', 
   },
   loginInfoTitle: {
-    fontSize: 20, // Réduction de la taille de la police pour les petits écrans
+    fontSize: 20, 
     fontWeight: 'bold',
-    marginBottom: 10, // Réduction de l'espacement
+    marginBottom: 10, 
   },
   loginInfoText: {
-    fontSize: 14, // Taille de police adaptée pour mobile
+    fontSize: 14, 
     marginBottom: 10,
-    textAlign: 'center', // Centrage du texte sur mobile
+    textAlign: 'center', 
   },
   linkText: {
     color: '#3490dc',
@@ -97,42 +141,42 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   card: {
-    borderRadius: 15, // Réduction du rayon de bordure pour un look plus adapté au mobile
+    borderRadius: 15, 
     shadowOpacity: 0.1,
     shadowRadius: 4,
     overflow: 'hidden',
-    margin: 10, // Ajout d'une marge autour de la carte
+    margin: 10, 
   },
   cardHeader: {
     backgroundColor: '#6AC8FF',
-    padding: 15, // Réduction du padding
+    padding: 15, 
   },
   cardHeaderText: {
     color: '#fff',
     textAlign: 'center',
-    fontSize: 18, // Réduction de la taille de la police pour les petits écrans
+    fontSize: 18, 
   },
   cardBody: {
     backgroundColor: '#fff',
-    padding: 20, // Réduction du padding pour les petits écrans
+    padding: 20, 
   },
   input: {
     borderWidth: 1,
     borderColor: '#ced4da',
     borderRadius: 10,
-    padding: 12, // Réduction du padding
+    padding: 12, 
     marginBottom: 15,
-    fontSize: 14, // Réduction de la taille de la police
+    fontSize: 14,
   },
   button: {
     backgroundColor: '#3490dc',
     borderRadius: 20,
-    padding: 12, // Réduction du padding
+    padding: 12, 
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 14, // Réduction de la taille de la police
+    fontSize: 14,
   },
 });
 

@@ -1,44 +1,291 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Modal, StyleSheet, TextInput } from 'react-native';
+import AsyncStorage  from '@react-native-async-storage/async-storage';
 
 const CountryDetails = ({ route }) => {
   const { countryName } = route.params;
+  const [healthCareServices, setHealthCareServices] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedDepartureCountry, setSelectedDepartureCountry] = useState('Sélectionnez votre pays de départ');
+  const [selectedCountry, setSelectedCountry] = useState('Sélectionnez votre pays de départ');
   const [recommendations, setRecommendations] = useState([]);
   const [newRecommendation, setNewRecommendation] = useState('');
+  const [paysId, setPaysId] = useState('');
+  const [selectedCountryId, setSelectedCountryId] = useState('');
+  const [distance, setDistance] = useState(null);
+  const [carbonFootprint, setCarbonFootprint] = useState(null);
 
-  // Données simulées pour les soins et les pays
-  const healthCareServices = [
-    { id: '1', service: 'Consultation médicale', prix: '50€' },
-    { id: '2', service: 'Radiographie', prix: '70€' }
-  ];
-  const departureCountries = ['Pays 1', 'Pays 2', 'Pays 3'];
 
+  const [departureCountries, setDepartureCountries] = useState([]);
+
+  const apiURL = "http://172.20.10.2:8888/api";
+
+  const getStoredUserId = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      console.log(userId); // Affiche l'ID de l'utilisateur dans la console
+      return userId;
+    } catch (error) {
+      console.error('Erreur lors de la récupération de l\'ID de l\'utilisateur:', error);
+      return null;
+    }
+  };
+  
+  
+  const getActesSante = async () => {
+    try {
+      const response = await fetch(`${apiURL}/actesante/${countryName}`);
+      if (!response.ok) {
+        throw new Error('Erreur réseau lors de la récupération des données');
+      }
+      const data = await response.json();
+      const paysIdValue = data.pays_id; 
+      setPaysId(paysIdValue); 
+      const actesSante = data.actesSante;
+      const formattedData = actesSante.map(item => ({
+        id: item.id.toString(),
+        service: item.nom,
+        prix: `${item.prix}€`
+      }));
+      setHealthCareServices(formattedData);
+  
+      // Attendre que setPaysId soit terminé avant d'appeler getRecommandations
+      await getRecommandations(paysIdValue);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des actes de santé:", error);
+    }
+  };
+  
+
+  const getRecommandations = async (paysId) => {
+    try {
+      const response = await fetch(`${apiURL}/recommandations/${paysId}`);
+      if (!response.ok) {
+        throw new Error('Erreur réseau lors de la récupération des recommandations');
+      }
+      const data = await response.json();
+      const formattedData = data.recommandations.map(item => ({
+        id: item.id.toString(),
+        text: item.contenu
+      }));
+      setRecommendations(formattedData);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des recommandations:", error);
+    }
+  };
+
+  const getCountriesByName = async () => {
+    try {
+      const response = await fetch(`${apiURL}/pays/names`);
+      if (!response.ok) {
+        throw new Error('Erreur réseau lors de la récupération des noms de pays');
+      }
+  
+      const data = await response.json();
+
+      // Mettez à jour l'état avec la liste des noms de pays
+      setDepartureCountries(data);  
+    } catch (error) {
+      console.error("Erreur lors de la récupération des noms de pays:", error);
+    }
+  };
+
+  const getCountryByEnglishName = async (countryName) => {
+    try {
+      const response = await fetch(`${apiURL}/pays/${countryName}`);
+      if (!response.ok) {
+        throw new Error('Erreur réseau lors de la récupération des noms de pays');
+      }
+  
+      const data = await response.json();
+  
+      if (data != null) {
+        // Vous pouvez récupérer l'ID du pays depuis la réponse de l'API
+        setSelectedCountryId(data.id);
+        return data.nom_anglais ;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des noms de pays:", error);
+      return null;
+    }
+  };
+  
   useEffect(() => {
-    const fakeRecommendations = [
-      { id: '1', text: 'Assurez-vous d’avoir une assurance voyage adaptée.' },
-      { id: '2', text: 'Vérifiez les exigences de visa pour la France.' }
-    ];
-    setRecommendations(fakeRecommendations);
+    getActesSante();
+    getCountriesByName();
+    getStoredUserId();
   }, []);
 
-  const handleReserveCare = (careId) => {
-    alert(`Réservation du soin ${careId}`);
-  };
-
-  const handleAddRecommendation = () => {
-    setRecommendations([...recommendations, { id: Date.now().toString(), text: newRecommendation }]);
-    setNewRecommendation('');
-  };
-
-  const handleDeleteRecommendation = (recommendationId) => {
-    setRecommendations(recommendations.filter(r => r.id !== recommendationId));
-  };
-
-  const handleEstimateCarbonFootprint = () => {
-    alert(`Empreinte carbone estimée pour un voyage depuis ${selectedDepartureCountry} vers ${countryName}.`);
-  };
+  const addTrajet = async (paysId, selectedCountryId, carbonFootprint) => {
+    try {
+      const userId = await getStoredUserId(); // Récupérer l'ID de l'utilisateur depuis AsyncStorage
+  
+      // Préparer les données à envoyer au serveur
+      const requestData = {
+        user_id: userId,
+        pays_id: paysId,
+        pays_id2: selectedCountryId, // Remarquez que vous avez deux champs 'pays_id', vous devrez peut-être ajuster cela selon vos besoins
+        empreinte_co2: carbonFootprint,
+      };
+  
+      const response = await fetch(`${apiURL}/deplacement`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+  
+      if (response.status === 201) {
+        const responseData = await response.json();
+        console.log('Déplacement créé avec succès:', responseData.deplacement);
+        return responseData.deplacement;
+      } else {
+        console.error('Erreur lors de la création du déplacement:', response.status);
+        return null;
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du trajet:', error);
+      return null;
+    }
+  };  
+    const AddRecommendation = async () => {
+      try {
+        const response = await fetch(`${apiURL}/recommandations`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            contenu: newRecommendation,
+            pays_id: paysId, 
+          }),
+        });
+    
+        if (response.ok) {
+          const data = await response.json();
+          if (data.recommandation) {
+            console.log('Recommandation créée avec succès:', data.recommandation);
+    
+            setNewRecommendation('');
+    
+          } else {
+            console.error('Erreur lors de la création de la recommandation:', data.message);
+          }
+        } else {
+          console.error('Erreur lors de la création de la recommandation:', response.statusText);
+        }
+      } catch (error) {
+        console.error('Erreur lors de la création de la recommandation:', error);
+      }
+      getRecommandations(paysIdValue);
+    };  
+    const handleDeleteRecommendation = async (recommendationId) => {
+      try {
+        const response = await fetch(`${apiURL}/recommandations/${recommendationId}`, {
+          method: 'DELETE',
+        });
+        if (!response.ok) {
+          throw new Error('Erreur réseau lors de la suppression de la recommandation');
+        }
+        
+        setRecommendations(prevRecommendations =>
+          prevRecommendations.filter(recommendation => recommendation.id !== recommendationId)
+        );
+      } catch (error) {
+        console.error("Erreur lors de la suppression de la recommandation:", error);
+      }
+    };    
+    
+    const handleEstimateCarbonFootprint = async (departureCountry, selectedCountry) => {
+      async function getCapital(countryName) {
+        const apiUrl = `https://restcountries.com/v3.1/name/${encodeURIComponent(countryName)}`;
+        
+        try {
+          const response = await fetch(apiUrl);
+          const data = await response.json();
+      
+          if (Array.isArray(data) && data.length > 0) {
+            const capital = data[0].capital[0];
+            return capital;
+          } else {
+            return null;
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération de la capitale:', error);
+          return null;
+        }
+      }
+            
+      async function getLatLng(city) {
+        const apiKey = 'AIzaSyBJvL7tfCzIXc5w56h0xtbiF1_Lb5roxi4';
+        const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(city)}&key=${apiKey}`;
+        
+        try {
+          const response = await fetch(url);
+          const data = await response.json();
+          
+          if (data.status === 'OK') {
+            const location = data.results[0].geometry.location;
+            return { latitude: location.lat, longitude: location.lng };
+          } else {
+            return null;
+          }
+        } catch (error) {
+          console.error('Erreur lors de la récupération des coordonnées:', error);
+          return null;
+        }
+      }
+    
+      // Fonction pour calculer la distance entre deux points en utilisant la formule de la sphère
+      function calculateDistance(lat1, lon1, lat2, lon2) {
+        const earthRadius = 6371; // Rayon de la Terre en km
+        const latDelta = toRadians(lat2 - lat1);
+        const lonDelta = toRadians(lon2 - lon1);
+    
+        const a = Math.sin(latDelta / 2) * Math.sin(latDelta / 2) +
+                  Math.cos(toRadians(lat1)) * Math.cos(toRadians(lat2)) *
+                  Math.sin(lonDelta / 2) * Math.sin(lonDelta / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    
+        return earthRadius * c;
+      }
+    
+      // Fonction pour convertir des degrés en radians
+      function toRadians(degrees) {
+        return degrees * (Math.PI / 180);
+      }
+    
+      // Fonction pour calculer l'empreinte carbone
+      function calculateCarbonFootprint(distance) {
+        return distance * (229.97 * 0.001); // Conversion en kgCO2e/km/personne
+      }
+    
+      async function calculateEmissions(departureCountry, selectedCountry) {      
+        const englishDepartureCountry = await getCountryByEnglishName(departureCountry);
+        const englishSelectedCountry = await getCountryByEnglishName(selectedCountry);
+        const selectedCity = await getCapital(englishDepartureCountry);
+        const departureCity = await getCapital(englishSelectedCountry);
+        const departureLoc = await getLatLng(departureCity);
+        const selectedLoc = await getLatLng(selectedCity);
+    
+        if (departureLoc && selectedLoc) {
+          const distance = calculateDistance(departureLoc.latitude, departureLoc.longitude, selectedLoc.latitude, selectedLoc.longitude);
+          const carbonFootprint = calculateCarbonFootprint(distance);
+          
+          console.log(`La distance entre ${departureCountry} et ${selectedCountry}: ${distance.toFixed(2)} km`);
+          console.log(`L'empreinte carbone du voyage sera d'environ: ${carbonFootprint.toFixed(2)} kgCO2e/km/personne`);
+          setDistance(distance.toFixed(2));
+          setCarbonFootprint(carbonFootprint.toFixed(2));      
+        } else {
+          console.log("erreur");
+        }
+      }
+    
+      calculateEmissions(departureCountry, selectedCountry);
+      
+    };
 
   return (
     <ScrollView style={styles.container}>
@@ -50,9 +297,6 @@ const CountryDetails = ({ route }) => {
           {healthCareServices.map((service) => (
             <View key={service.id} style={styles.serviceCard}>
               <Text style={styles.serviceText}>{service.service} - {service.prix}</Text>
-              <TouchableOpacity style={styles.button} onPress={() => handleReserveCare(service.id)}>
-                <Text style={styles.buttonText}>Réserver ce soin</Text>
-              </TouchableOpacity>
             </View>
           ))}
 
@@ -67,49 +311,62 @@ const CountryDetails = ({ route }) => {
           ))}
 
           
-          <TouchableOpacity style={styles.button} onPress={handleAddRecommendation}>
-            <Text style={styles.buttonText}>Ajouter Recommandation</Text>
-          </TouchableOpacity>
-          <TextInput
-            style={styles.input}
-            onChangeText={setNewRecommendation}
-            value={newRecommendation}
-            placeholder="Ajouter une recommandation"
-          />
+            <TouchableOpacity style={styles.button} onPress={AddRecommendation}>
+              <Text style={styles.buttonText}>Ajouter Recommandation</Text>
+            </TouchableOpacity>
+            <TextInput
+              style={styles.input}
+              onChangeText={setNewRecommendation}
+              value={newRecommendation}
+              placeholder="Ajouter une recommandation"
+            />
           
-          <Text style={styles.subtitle}>Estimation de l'Empreinte Carbone pour le Voyage</Text>
-          <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.dropdown}>
-            <Text>{selectedDepartureCountry}</Text>
-          </TouchableOpacity>
+            <Text style={styles.subtitle}>Estimation de l'Empreinte Carbone pour le Voyage</Text>
+            <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.dropdown}>
+              <Text>{selectedCountry}</Text>
+            </TouchableOpacity>
 
-          <Modal
-            animationType="slide"
-            transparent={true}
-            visible={modalVisible}
-            onRequestClose={() => setModalVisible(false)}>
-            <View style={styles.modalView}>
-              <ScrollView>
-                {departureCountries.map((country, index) => (
-                  <TouchableOpacity
-                    key={index}
-                    style={styles.countryOption}
-                    onPress={() => {
-                      setSelectedDepartureCountry(country);
-                      setModalVisible(false);
-                    }}>
-                    <Text>{country}</Text>
-                  </TouchableOpacity>
-                ))}
-              </ScrollView>
+            <Modal
+              animationType="slide"
+              transparent={true}
+              visible={modalVisible}
+              onRequestClose={() => setModalVisible(false)}>
+              <View style={styles.modalView}>
+                <ScrollView>
+                  {departureCountries.map((country, index) => (
+                    <TouchableOpacity
+                      key={index}
+                      style={styles.countryOption}
+                      onPress={() => {
+                        setModalVisible(false);
+                        setSelectedCountry(country);
+                      }}>
+                      <Text>{country}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            </Modal>
+
+            <TouchableOpacity style={styles.button} onPress={() => handleEstimateCarbonFootprint(countryName, selectedCountry)}>
+              <Text style={styles.buttonText}>Calculer l'empreinte carbone</Text>
+            </TouchableOpacity>
+            <View>
+            {distance !== null && carbonFootprint !== null && (
+                <View>
+                  <Text>Distance: {distance} km</Text>
+                  <Text>Empreinte carbone: {carbonFootprint} kgCO2e/km/personne</Text>
+                </View>
+              )}
             </View>
-          </Modal>
-
-          <TouchableOpacity style={styles.button} onPress={handleEstimateCarbonFootprint}>
-            <Text style={styles.buttonText}>Calculer l'empreinte carbone</Text>
-          </TouchableOpacity>
+            {carbonFootprint ? (
+              <TouchableOpacity style={styles.button} onPress={() => addTrajet(paysId, selectedCountryId, carbonFootprint)}>
+                <Text style={styles.buttonText}>Ajouter aux trajets sauvegardés</Text>
+              </TouchableOpacity>
+            ) : null}
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
   );
 };
 

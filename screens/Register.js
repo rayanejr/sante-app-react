@@ -5,6 +5,46 @@ import { useNavigation } from '@react-navigation/native';
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleRegister = async () => {
+    if (password !== confirmPassword) {
+      setErrorMessage("Les mots de passe ne correspondent pas.");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://172.20.10.2:8888/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: name,
+          email: email,
+          password: password,
+        }),
+      });
+    
+
+      const data = await response.json();
+
+      console.log(data);
+      if (response.status === 201) {
+        navigation.navigate('Login');
+      } else {
+        // Gérer les erreurs de l'API
+        setErrorMessage(data.message || 'Erreur lors de l’inscription');
+      }
+    } catch (error) {
+      setErrorMessage(error.message || 'Une erreur réseau est survenue');
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.card}>
@@ -17,25 +57,36 @@ const RegisterScreen = () => {
             style={styles.input}
             placeholder="Votre nom complet"
             autoCapitalize="words"
+            value={name}
+            onChangeText={(text) => setName(text)}
+            
           />
           <TextInput
             style={styles.input}
             placeholder="Votre email"
             keyboardType="email-address"
+            value={email}
+            onChangeText={(text) => setEmail(text)}
+            
           />
           <TextInput
             style={styles.input}
             placeholder="Créez un mot de passe"
             secureTextEntry
+            value={password}
+            onChangeText={(text) => setPassword(text)}
           />
           <TextInput
             style={styles.input}
             placeholder="Confirmez votre mot de passe"
             secureTextEntry
+            value={confirmPassword}
+            onChangeText={(text) => setConfirmPassword(text)}
           />
           <TouchableOpacity style={styles.button}>
             <Text style={styles.buttonText}>S'inscrire</Text>
           </TouchableOpacity>
+          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
           <View style={styles.alreadyRegistered}>
           <TouchableOpacity onPress={() => navigation.navigate('Login')}>
             <Text style={styles.alreadyRegisteredText}>Déjà inscrit ? Connectez-vous</Text>
