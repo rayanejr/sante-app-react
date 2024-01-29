@@ -5,7 +5,7 @@ import { StyleSheet, View, Button, Image, TouchableOpacity } from 'react-native'
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 // Importez vos écrans ici
-import Dashboard from './screens/Dashboard';
+import Dashboard from './screens/UserDashboard';
 import CountryDetails from './screens/CountryDetails';
 import Login from './screens/Login';
 import Register from './screens/Register';

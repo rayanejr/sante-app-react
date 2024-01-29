@@ -37,7 +37,7 @@ const LoginScreen = () => {
         }),
       });
       const data = await response.json();
-      
+      console.log(data);
       setUserId(data.id); 
 
       if (response.status === 200) {

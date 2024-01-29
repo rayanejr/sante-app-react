@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react'; 
 import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; // Importez useNavigation depuis React Navigation
+import { useNavigation } from '@react-navigation/native'; 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const WelcomeScreen = () => {

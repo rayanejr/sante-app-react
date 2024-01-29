@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react'; 
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-
+import { useNavigation } from '@react-navigation/native'; 
 
 const RegisterScreen = () => {
   const navigation = useNavigation();
@@ -10,6 +9,8 @@ const RegisterScreen = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const ip="172.20.10.2";
+  const apiURL = `http://${ip}:8888/api`;
 
   const handleRegister = async () => {
     if (password !== confirmPassword) {
@@ -18,7 +19,7 @@ const RegisterScreen = () => {
     }
 
     try {
-      const response = await fetch('http://172.20.10.2:8888/api/register', {
+      const response = await fetch(`${apiURL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -44,6 +45,7 @@ const RegisterScreen = () => {
       setErrorMessage(error.message || 'Une erreur réseau est survenue');
     }
   };
+
 
   return (
     <ScrollView style={styles.container}>
@@ -83,7 +85,7 @@ const RegisterScreen = () => {
             value={confirmPassword}
             onChangeText={(text) => setConfirmPassword(text)}
           />
-          <TouchableOpacity style={styles.button}>
+          <TouchableOpacity style={styles.button} onPress={handleRegister}>
             <Text style={styles.buttonText}>S'inscrire</Text>
           </TouchableOpacity>
           {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
