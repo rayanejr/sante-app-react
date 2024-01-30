@@ -14,7 +14,7 @@ const AdminScreen = () => {
       {/* Sidebar */}
       <View style={[styles.sidebarWrapper, windowWidth < 768 ? styles.sidebarWrapperSmall : null]}>
         <Text style={styles.sidebarHeading}>Sante-APP</Text>
-        <TouchableOpacity onPress={() => navigate('ActesSanteListScreen')} style={styles.listGroupItem}>
+        <TouchableOpacity onPress={() => navigate('ActesSanteList')} style={styles.listGroupItem}>
           <Text style={styles.listGroupItemText}>Actes de Santé</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigate('DeplacementsList')} style={styles.listGroupItem}>
@@ -136,4 +136,3 @@ const styles = StyleSheet.create({
 });
 
 export default AdminScreen;
-

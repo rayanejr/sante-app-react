@@ -1,24 +1,20 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; 
+import AsyncStorage  from '@react-native-async-storage/async-storage';
+import { clickProps } from 'react-native-web/dist/cjs/modules/forwardedProps';
 
-const LoginScreen = () => {
-  const navigation = useNavigation(); 
-
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [ userId,setUserId ] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-
-
-  const handleRegisterPress = () => {
-    navigation.navigate('Register'); 
-  };
-
+  const ip = "192.168.1.36";
+  const apiURL = `http://${ip}:8888/api`;
 
   const storeUserId = async (userId) => {
     try {
       await AsyncStorage.setItem('userId', userId.toString());
+      const storedUserId = await AsyncStorage.getItem('userId');
     } catch (error) {
       console.error('Erreur lors du stockage de l\'ID de l\'utilisateur:', error);
     }
@@ -26,7 +22,7 @@ const LoginScreen = () => {
     
   const handleLogin = async () => {
     try {
-      const response = await fetch('http://172.20.10.2:8888/api/login', {
+      const response = await fetch(`${apiURL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -37,9 +33,7 @@ const LoginScreen = () => {
         }),
       });
       const data = await response.json();
-      console.log(data);
-      setUserId(data.id); 
-
+      
       if (response.status === 200) {
         // Vérifier si l'utilisateur est un administrateur
         if (data.is_admin) {
@@ -47,7 +41,7 @@ const LoginScreen = () => {
           navigation.navigate('AdminDashboard');
         } else {
           // Naviguer vers le tableau de bord utilisateur standard
-          storeUserId(userId);
+          storeUserId(data.id);
           navigation.navigate('UserDashboard');
         }
       } else {
@@ -59,28 +53,25 @@ const LoginScreen = () => {
       setErrorMessage(error.message || 'Une erreur est survenue lors de la connexion');
     }
   };
-
+    
   return (
     <ScrollView style={styles.container}>
       <View style={styles.loginContainer}>
         <View style={styles.loginInfo}>
-          <Text style={styles.loginInfoTitle}>Bienvenue sur Santé-App</Text>
-          <Text style={styles.loginInfoText}>
-            Rejoignez-nous et découvrez le moyen premium de vérifier votre état de santé, 
-            de gérer vos rendez-vous et de rester au courant de vos besoins médicaux en toute simplicité.
-          </Text>
-          <Text style={styles.loginInfoText}>
-            Vous n'avez pas de compte ? <Text style={styles.linkText} onPress={handleRegisterPress}>Inscrivez-vous maintenant</Text>
-          </Text>
+          {/* ... contenu de loginInfo ... */}
         </View>
-
+  
         <View style={styles.loginForm}>
           <View style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardHeaderText}>Connectez-vous à votre compte</Text>
             </View>
+  
             <View style={styles.cardBody}>
+              {/* Affichage du message d'erreur */}
               {errorMessage ? <Text style={styles.errorMessage}>{errorMessage}</Text> : null}
+  
+              {/* Champs de saisie Email et Mot de passe */}
               <TextInput
                 style={styles.input}
                 onChangeText={setEmail}
@@ -95,6 +86,8 @@ const LoginScreen = () => {
                 placeholder="Mot de passe"
                 secureTextEntry
               />
+  
+              {/* Bouton de connexion */}
               <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Text style={styles.buttonText}>Se connecter</Text>
               </TouchableOpacity>
@@ -103,34 +96,33 @@ const LoginScreen = () => {
         </View>
       </View>
     </ScrollView>
-  );
+  );  
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    padding: 10, 
-  },
-  loginContainer: {
-    flexDirection: 'column', 
+    padding: 10, // Réduction du padding pour les petits écrans
+  },loginContainer: {
+    flexDirection: 'column', // Utilisation d'un stack layout sur mobile
     justifyContent: 'center',
     alignItems: 'center',
   },
   loginInfo: {
-    margin: 10, 
+    margin: 10, // Réduction de la marge
     flex: 1,
-    alignItems: 'center', 
+    alignItems: 'center', // Centrage du texte sur mobile
   },
   loginInfoTitle: {
-    fontSize: 20, 
+    fontSize: 20, // Réduction de la taille de la police pour les petits écrans
     fontWeight: 'bold',
-    marginBottom: 10, 
+    marginBottom: 10, // Réduction de l'espacement
   },
   loginInfoText: {
-    fontSize: 14, 
+    fontSize: 14, // Taille de police adaptée pour mobile
     marginBottom: 10,
-    textAlign: 'center', 
+    textAlign: 'center', // Centrage du texte sur mobile
   },
   linkText: {
     color: '#3490dc',
@@ -141,43 +133,48 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   card: {
-    borderRadius: 15, 
+    borderRadius: 15, // Réduction du rayon de bordure pour un look plus adapté au mobile
     shadowOpacity: 0.1,
     shadowRadius: 4,
     overflow: 'hidden',
-    margin: 10, 
+    margin: 10, // Ajout d'une marge autour de la carte
   },
   cardHeader: {
     backgroundColor: '#6AC8FF',
-    padding: 15, 
+    padding: 15, // Réduction du padding
   },
   cardHeaderText: {
     color: '#fff',
     textAlign: 'center',
-    fontSize: 18, 
+    fontSize: 18, // Réduction de la taille de la police pour les petits écrans
   },
   cardBody: {
     backgroundColor: '#fff',
-    padding: 20, 
+    padding: 20, // Réduction du padding pour les petits écrans
   },
   input: {
     borderWidth: 1,
     borderColor: '#ced4da',
     borderRadius: 10,
-    padding: 12, 
+    padding: 12, // Réduction du padding
     marginBottom: 15,
-    fontSize: 14,
+    fontSize: 14, // Réduction de la taille de la police
   },
   button: {
     backgroundColor: '#3490dc',
     borderRadius: 20,
-    padding: 12, 
+    padding: 12, // Réduction du padding
     alignItems: 'center',
   },
   buttonText: {
     color: '#fff',
-    fontSize: 14,
+    fontSize: 14, // Réduction de la taille de la police
   },
+  errorMessage: {
+    color: 'red',
+    textAlign: 'center',
+    marginBottom: 10,
+  }
 });
 
 export default LoginScreen;

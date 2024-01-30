@@ -17,12 +17,12 @@ const CountryDetails = ({ route }) => {
 
   const [departureCountries, setDepartureCountries] = useState([]);
 
-  const apiURL = "http://172.20.10.2:8888/api";
+  const ip = "192.168.1.36";
+  const apiURL = `http://${ip}:8888/api`;
 
   const getStoredUserId = async () => {
     try {
       const userId = await AsyncStorage.getItem('userId');
-      console.log(userId); // Affiche l'ID de l'utilisateur dans la console
       return userId;
     } catch (error) {
       console.error('Erreur lors de la récupération de l\'ID de l\'utilisateur:', error);
@@ -114,18 +114,16 @@ const CountryDetails = ({ route }) => {
   useEffect(() => {
     getActesSante();
     getCountriesByName();
-    getStoredUserId();
   }, []);
 
   const addTrajet = async (paysId, selectedCountryId, carbonFootprint) => {
     try {
-      const userId = await getStoredUserId(); // Récupérer l'ID de l'utilisateur depuis AsyncStorage
-  
-      // Préparer les données à envoyer au serveur
+      const userId = await getStoredUserId();
+      
       const requestData = {
         user_id: userId,
         pays_id: paysId,
-        pays_id2: selectedCountryId, // Remarquez que vous avez deux champs 'pays_id', vous devrez peut-être ajuster cela selon vos besoins
+        pays_id2: selectedCountryId, 
         empreinte_co2: carbonFootprint,
       };
   
@@ -138,9 +136,7 @@ const CountryDetails = ({ route }) => {
       });
   
       if (response.status === 201) {
-        const responseData = await response.json();
-        console.log('Déplacement créé avec succès:', responseData.deplacement);
-        return responseData.deplacement;
+        alert('Déplacement enregistré avec succès!');
       } else {
         console.error('Erreur lors de la création du déplacement:', response.status);
         return null;
@@ -166,7 +162,6 @@ const CountryDetails = ({ route }) => {
         if (response.ok) {
           const data = await response.json();
           if (data.recommandation) {
-            console.log('Recommandation créée avec succès:', data.recommandation);
     
             setNewRecommendation('');
     
@@ -179,7 +174,7 @@ const CountryDetails = ({ route }) => {
       } catch (error) {
         console.error('Erreur lors de la création de la recommandation:', error);
       }
-      getRecommandations(paysIdValue);
+      getRecommandations(paysId);
     };  
     const handleDeleteRecommendation = async (recommendationId) => {
       try {
@@ -274,43 +269,42 @@ const CountryDetails = ({ route }) => {
           const distance = calculateDistance(departureLoc.latitude, departureLoc.longitude, selectedLoc.latitude, selectedLoc.longitude);
           const carbonFootprint = calculateCarbonFootprint(distance);
           
-          console.log(`La distance entre ${departureCountry} et ${selectedCountry}: ${distance.toFixed(2)} km`);
-          console.log(`L'empreinte carbone du voyage sera d'environ: ${carbonFootprint.toFixed(2)} kgCO2e/km/personne`);
           setDistance(distance.toFixed(2));
           setCarbonFootprint(carbonFootprint.toFixed(2));      
         } else {
-          console.log("erreur");
+          console.error("Erreur de calcul des émissions de carbone lors du trajet");
         }
       }
     
       calculateEmissions(departureCountry, selectedCountry);
       
     };
+    
 
-  return (
-    <ScrollView style={styles.container}>
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardHeaderText}>Actes de Santé en {countryName}</Text>
-        </View>
-        <View style={styles.cardBody}>
-          {healthCareServices.map((service) => (
-            <View key={service.id} style={styles.serviceCard}>
-              <Text style={styles.serviceText}>{service.service} - {service.prix}</Text>
-            </View>
-          ))}
+    return (
+      <ScrollView style={styles.container}>
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.cardHeaderText}>Actes de Santé en {countryName}</Text>
+          </View>
+          <View style={styles.cardBody}>
+            {healthCareServices.map((service) => (
+              <View key={service.id} style={styles.serviceCard}>
+                <Text style={styles.serviceText}>{service.service} - {service.prix}</Text>
+              </View>
+            ))}
 
-          <Text style={styles.subtitle}>Recommandations pour {countryName}</Text>
-          {recommendations.map((recommendation) => (
-            <View key={recommendation.id} style={styles.recommendationCard}>
-              <Text>{recommendation.text}</Text>
-              <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteRecommendation(recommendation.id)}>
-                <Text style={styles.deleteButtonText}>Supprimer</Text>
-              </TouchableOpacity>
-            </View>
-          ))}
+            <Text style={styles.subtitle}>Recommandations pour {countryName}</Text>
+            {recommendations.map((recommendation) => (
+              <View key={recommendation.id} style={styles.recommendationCard}>
+                <Text>{recommendation.text}</Text>
+                <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteRecommendation(recommendation.id)}>
+                  <Text style={styles.deleteButtonText}>Supprimer</Text>
+                </TouchableOpacity>
+              </View>
+            ))}
 
-          
+            
             <TouchableOpacity style={styles.button} onPress={AddRecommendation}>
               <Text style={styles.buttonText}>Ajouter Recommandation</Text>
             </TouchableOpacity>
@@ -320,7 +314,7 @@ const CountryDetails = ({ route }) => {
               value={newRecommendation}
               placeholder="Ajouter une recommandation"
             />
-          
+            
             <Text style={styles.subtitle}>Estimation de l'Empreinte Carbone pour le Voyage</Text>
             <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.dropdown}>
               <Text>{selectedCountry}</Text>
@@ -347,10 +341,12 @@ const CountryDetails = ({ route }) => {
                 </ScrollView>
               </View>
             </Modal>
-
+            
+            {selectedCountry !== "Sélectionnez votre pays de départ" && (
             <TouchableOpacity style={styles.button} onPress={() => handleEstimateCarbonFootprint(countryName, selectedCountry)}>
               <Text style={styles.buttonText}>Calculer l'empreinte carbone</Text>
             </TouchableOpacity>
+            )}
             <View>
             {distance !== null && carbonFootprint !== null && (
                 <View>
@@ -367,111 +363,111 @@ const CountryDetails = ({ route }) => {
           </View>
         </View>
       </ScrollView>
-  );
-};
+    );
+  };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f8f9fa',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-    overflow: 'hidden',
-    marginBottom: 20,
-  },
-  cardHeader: {
-    backgroundColor: '#6AC8FF',
-    padding: 20,
-  },
-  cardHeaderText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  cardBody: {
-    padding: 20,
-    backgroundColor: '#fff',
-  },
-  serviceCard: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-    marginBottom: 10,
-  },
-  serviceText: {
-    fontSize: 16,
-    marginBottom: 5,
-  },
-  subtitle: {
-    fontWeight: 'bold',
-    marginTop: 20,
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: '#007bff', // Bleu plus vif
-    padding: 10,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  buttonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-  deleteButton: {
-    backgroundColor: '#dc3545', // Rouge plus vif
-    padding: 5,
-    borderRadius: 5,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  deleteButtonText: {
-    color: '#fff',
-    fontWeight: 'bold',
-  },
-
-  input: {
-    borderWidth: 1,
-    borderColor: '#ddd',
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  dropdown: {
-    padding: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 4,
-    marginBottom: 20,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
+  const styles = StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: 20,
+      backgroundColor: '#f8f9fa',
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  countryOption: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-});
+    card: {
+      backgroundColor: '#fff',
+      borderRadius: 20,
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+      overflow: 'hidden',
+      marginBottom: 20,
+    },
+    cardHeader: {
+      backgroundColor: '#6AC8FF',
+      padding: 20,
+    },
+    cardHeaderText: {
+      color: '#fff',
+      fontSize: 20,
+      fontWeight: 'bold',
+    },
+    cardBody: {
+      padding: 20,
+      backgroundColor: '#fff',
+    },
+    serviceCard: {
+      padding: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ddd',
+      marginBottom: 10,
+    },
+    serviceText: {
+      fontSize: 16,
+      marginBottom: 5,
+    },
+    subtitle: {
+      fontWeight: 'bold',
+      marginTop: 20,
+      marginBottom: 10,
+    },
+    button: {
+      backgroundColor: '#007bff', // Bleu plus vif
+      padding: 10,
+      borderRadius: 5,
+      alignItems: 'center',
+      marginTop: 10,
+    },
+    buttonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+    },
+    deleteButton: {
+      backgroundColor: '#dc3545', // Rouge plus vif
+      padding: 5,
+      borderRadius: 5,
+      alignItems: 'center',
+      marginTop: 10,
+    },
+    deleteButtonText: {
+      color: '#fff',
+      fontWeight: 'bold',
+    },
 
-export default CountryDetails;
+    input: {
+      borderWidth: 1,
+      borderColor: '#ddd',
+      padding: 10,
+      borderRadius: 5,
+      marginBottom: 10,
+    },
+    dropdown: {
+      padding: 10,
+      borderWidth: 1,
+      borderColor: '#ddd',
+      borderRadius: 4,
+      marginBottom: 20,
+    },
+    modalView: {
+      margin: 20,
+      backgroundColor: 'white',
+      borderRadius: 20,
+      padding: 35,
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    },
+    countryOption: {
+      padding: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: '#ddd',
+    },
+  });
+
+  export default CountryDetails;

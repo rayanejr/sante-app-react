@@ -22,6 +22,17 @@ Santé-APP est une application React Native conçue pour améliorer l'accès aux
 - `react-native-vector-icons` et `@expo/vector-icons` : Pour utiliser des icônes.
 - `axios` : Pour les requêtes HTTP.
 
+## Prerequis
+
+Avant de commencer, assurez-vous que votre téléphone et votre ordinateur sont connectés au même réseau Wi-Fi. Cela est nécessaire pour assurer une communication fluide entre les deux appareils. Ensuite, récupérez l'adresse IPV4 de votre ordinateur. Cette adresse sera utilisée dans tous les fichiers situés dans le dossier screens de l'application.
+
+Pour trouver l'adresse IPV4 de votre ordinateur :
+
+- Sous Windows, ouvrez l'invite de commande et tapez ipconfig.
+- Sous MacOS, allez dans Préférences Système > Réseau, et sélectionnez votre connexion Wi-Fi.
+- Sous Linux, ouvrez le terminal et tapez hostname -I.
+Une fois que vous avez l'adresse IPV4, remplacez-la dans tous les fichiers appropriés dans le dossier screens.
+
 ## Installation
 
 Pour exécuter Santé-APP sur votre système local, suivez ces étapes :

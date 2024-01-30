@@ -1,14 +1,10 @@
-import React, { useState } from 'react'; 
+import { useNavigation } from '@react-navigation/native';
+import React from 'react';
 import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useNavigation } from '@react-navigation/native'; 
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const WelcomeScreen = () => {
-  const navigation = useNavigation(); // Obtenez l'objet de navigation
-
-  const handleInscriptionPress = () => {
-    navigation.navigate('Register'); 
-  };
+  const navigation = useNavigation();
 
   return (
     <ScrollView style={styles.container}>
@@ -26,19 +22,16 @@ const WelcomeScreen = () => {
       {/* Features */}
       <View style={styles.featuresContainer}>
         <View style={styles.feature}>
-          {/* Icône FontAwesome */}
           <Icon name="medkit" size={30} color="#3A8DFF" />
           <Text style={styles.featureTitle}>Service de Qualité</Text>
           <Text style={styles.featureText}>Accédez à des services de santé de haute qualité à des prix abordables.</Text>
         </View>
         <View style={styles.feature}>
-          {/* Icône FontAwesome */}
           <Icon name="user-md" size={30} color="#3A8DFF" />
           <Text style={styles.featureTitle}>Experts Qualifiés</Text>
           <Text style={styles.featureText}>Consultez des spécialistes renommés dans chaque domaine médical.</Text>
         </View>
         <View style={styles.feature}>
-          {/* Icône FontAwesome */}
           <Icon name="heartbeat" size={30} color="#3A8DFF" />
           <Text style={styles.featureTitle}>Soins Personnalisés</Text>
           <Text style={styles.featureText}>Recevez des soins et des traitements adaptés à vos besoins personnels.</Text>
@@ -55,7 +48,7 @@ const WelcomeScreen = () => {
       <View style={styles.ctaContainer}>
         <Text style={styles.ctaTitle}>Prêt à découvrir votre solution santé ?</Text>
         <Text style={styles.ctaText}>Inscrivez-vous dès maintenant et rejoignez les milliers d'utilisateurs qui ont optimisé leur couverture santé avec nous.</Text>
-        <TouchableOpacity style={styles.ctaButton} onPress={handleInscriptionPress}>
+       <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('Register')}>
           <Text style={styles.ctaButtonText}>Inscription</Text>
         </TouchableOpacity>
       </View>

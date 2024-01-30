@@ -1,21 +1,22 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { StyleSheet, View, Button, Image, TouchableOpacity } from 'react-native';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { StyleSheet, View, Button, Image, TouchableOpacity } from 'react-native';
+import AsyncStorage  from '@react-native-async-storage/async-storage';
 
-// Importez vos écrans ici
-import Dashboard from './screens/UserDashboard';
-import CountryDetails from './screens/CountryDetails';
+//Screens
 import Login from './screens/Login';
-import Register from './screens/Register';
+import UserList from './screens/UserList';
 import Welcome from './screens/Welcome';
+import Register from './screens/Register';
+import AdminDashboard from './screens/AdminDashboard';
+import UserDashboard from './screens/UserDashboard';
+import CountryDetails from './screens/CountryDetails';
 import ConfirmPassword from './screens/ConfirmPassword';
 import ForgotPassword from './screens/ForgotPassword';
 import ResetPassword from './screens/ResetPassword';
 import EmailVerification from './screens/EmailVerification';
-import UserList from './screens/UserList';
-import Admin from './screens/Admin';
 import EditUserScreen from './screens/EditUser';
 import AddUserScreen from './screens/AddUser';
 import RecommandationListScreen from './screens/RecommandationList';
@@ -31,14 +32,9 @@ import AddActesSanteScreen from './screens/AddActesSante';
 import EditPaysScreen from './screens/EditPays';
 import AddPaysScreen from './screens/AddPays';
 
-
-
 const Stack = createNativeStackNavigator();
 
-export default function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
-  const [isAdmin, setIsAdmin] = useState(true);
-
+const App = () => {
 
   const LogoHeader = ({ navigation }) => (
     <TouchableOpacity onPress={() => navigation.navigate('Welcome')}>
@@ -49,26 +45,20 @@ export default function App() {
     </TouchableOpacity>
   );
 
+  const AdminHeaderButtons = ({ navigation }) => (
+    <View style={styles.rightHeaderButtons}>
+      <Button title="AdminDashboard" onPress={() => navigation.navigate('AdminDashboard')} />
+      <Button title="Déconnexion" onPress={() => handleLogout(navigation)} />
+    </View>
+  );
 
   const UserHeaderButtons = ({ navigation }) => (
     <View style={styles.rightHeaderButtons}>
-      <Button title="Dashboard" onPress={() => navigation.navigate('Dashboard')} />
-      <Button title="EmailVerification" onPress={() => navigation.navigate('EmailVerification')} />
-      <Button title="ConfirmPassword" onPress={() => navigation.navigate('ConfirmPassword')} />
-      <Button title="ForgotPassword" onPress={() => navigation.navigate('ForgotPassword')} />
-      <Button title="ResetPassword" onPress={() => navigation.navigate('ResetPassword')} />
-      <Button title="Déconnexion" onPress={() => setIsLoggedIn(false)} />
+      <Button title="UserDashboard" onPress={() => navigation.navigate('UserDashboard')} />
+      <Button title="Déconnexion" onPress={() => handleLogout(navigation)}/>
     </View>
   );
-
-  const AdminHeaderButtons = ({ navigation }) => (
-    <View style={styles.rightHeaderButtons}>
-      <Button title="Dashboard" onPress={() => navigation.navigate('Dashboard')} />
-      <Button title="Admin" onPress={() => navigation.navigate('Admin')} />
-      <Button title="Déconnexion" onPress={() => setIsLoggedIn(false)} />
-    </View>
-  );
-
+  
   const UnauthenticatedHeaderButtons = ({ navigation }) => (
     <View style={styles.rightHeaderButtons}>
       <Button title="Connexion" onPress={() => navigation.navigate('Login')} />
@@ -76,47 +66,65 @@ export default function App() {
     </View>
   );
 
+
+  const handleLogout = async (navigation) => {
+    try {
+      await AsyncStorage.removeItem('VotreCléDeSession');
+      navigation.navigate('Welcome');
+    } catch (error) {
+      console.error('Erreur lors de la déconnexion:', error);
+    }
+  };
+
+  function headerUnauthenticated(navigation) {
+    return {
+      headerTitle: () => <LogoHeader navigation={navigation} />,
+      headerRight: () => <UnauthenticatedHeaderButtons navigation={navigation} />
+    };
+  }
+
+  function headerUser(navigation) {
+    return {
+      headerTitle: () => <LogoHeader navigation={navigation} />,
+      headerRight: () => <UserHeaderButtons navigation={navigation} />
+    };
+  }
+
+  function headerAdmin(navigation) {
+    return {
+      headerTitle: () => <LogoHeader navigation={navigation} />,
+      headerRight: () => <AdminHeaderButtons navigation={navigation} />
+    };
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
-        <Stack.Screen 
-          name="Welcome" 
-          component={Welcome} 
-          options={({ navigation }) => ({
-            headerTitle: () => <LogoHeader navigation={navigation} />,
-            headerRight: () => isLoggedIn 
-              ? (isAdmin ? <AdminHeaderButtons navigation={navigation} /> : <UserHeaderButtons navigation={navigation} />)
-              : <UnauthenticatedHeaderButtons navigation={navigation} />
-          })}
-        />
-        {/* Add more Stack.Screen components here for each screen */}
-        <Stack.Screen name="ActesSanteListScreen" component={ActesSanteListScreen} />
-        <Stack.Screen name="DeplacementsList" component={DeplacementsListScreen} />
-        <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="Register" component={Register} />
-        <Stack.Screen name="Dashboard" component={Dashboard} />
-        <Stack.Screen name="CountryDetails" component={CountryDetails} />
-        <Stack.Screen name="EmailVerification" component={EmailVerification} />
-        <Stack.Screen name="ConfirmPassword" component={ConfirmPassword} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        <Stack.Screen name="ResetPassword" component={ResetPassword} />
-        <Stack.Screen name="Admin" component={Admin} />
-        <Stack.Screen name="UserList" component={UserList} />
-        <Stack.Screen name="AddUser" component={AddUserScreen} />
-        <Stack.Screen name="EditUser" component={EditUserScreen} />
-        <Stack.Screen name="RecommandationList" component={RecommandationListScreen} />
-        <Stack.Screen name="AddRecommandation" component={AddRecommandationScreen} />
-        <Stack.Screen name="EditRecommandation" component={EditRecommandationScreen} />
-        <Stack.Screen name="PaysList" component={PaysListScreen} />
-        <Stack.Screen name="EditDeplacements" component={EditDeplacementsScreen} />
-        <Stack.Screen name="EditActesSante" component={EditActesSanteScreen} />
-        <Stack.Screen name="AddDeplacements" component={AddDeplacementsScreen} />
-        <Stack.Screen name="AddActesSante" component={AddActesSanteScreen} />
-        <Stack.Screen name="EditPays" component={EditPaysScreen} />
-        <Stack.Screen name="AddPays" component={AddPaysScreen} />
-        
-
-    
+        <Stack.Screen name="Welcome" component={Welcome}  options={({ navigation }) => headerUnauthenticated(navigation)} />
+        <Stack.Screen name="ActesSanteListScreen" component={ActesSanteListScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="DeplacementsList" component={DeplacementsListScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="Login" component={Login} options={({ navigation }) => headerUnauthenticated(navigation)}/>
+        <Stack.Screen name="Register" component={Register} options={({ navigation }) => headerUnauthenticated(navigation)}/>
+        <Stack.Screen name="UserDashboard" component={UserDashboard}  options={({ navigation }) => headerUser(navigation)} />
+        <Stack.Screen name="CountryDetails" component={CountryDetails}  options={({ navigation }) => headerUser(navigation)} />
+        <Stack.Screen name="EmailVerification" component={EmailVerification} options={({ navigation }) => headerUnauthenticated(navigation)} />
+        <Stack.Screen name="ConfirmPassword" component={ConfirmPassword} options={({ navigation }) => headerUnauthenticated(navigation)}/>
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={({ navigation }) => headerUnauthenticated(navigation)}/>
+        <Stack.Screen name="ResetPassword" component={ResetPassword} options={({ navigation }) => headerUnauthenticated(navigation)}/>
+        <Stack.Screen name="AdminDashboard" component={AdminDashboard} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="UserList" component={UserList} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="AddUser" component={AddUserScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="EditUser" component={EditUserScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="RecommandationList" component={RecommandationListScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="AddRecommandation" component={AddRecommandationScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="EditRecommandation" component={EditRecommandationScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="PaysList" component={PaysListScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="EditDeplacements" component={EditDeplacementsScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="EditActesSante" component={EditActesSanteScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="AddDeplacements" component={AddDeplacementsScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="AddActesSante" component={AddActesSanteScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="EditPays" component={EditPaysScreen} options={({ navigation }) => headerAdmin(navigation)}/>
+        <Stack.Screen name="AddPays" component={AddPaysScreen} options={({ navigation }) => headerAdmin(navigation)}/>
       </Stack.Navigator>
     </NavigationContainer>
   );
@@ -133,3 +141,5 @@ const styles = StyleSheet.create({
     marginRight: 10,
   }
 });
+
+export default App;

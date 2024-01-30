@@ -1,70 +1,84 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 
-
-const AddActeDeSanteScreen = () => {
+const AddActesSanteScreen = ({navigation}) => {
   const [nom, setNom] = useState('');
   const [description, setDescription] = useState('');
   const [prix, setPrix] = useState('');
-  const [paysId, setPaysId] = useState('');
+  const [pays_id, setPays] = useState('');
+  const ip = "192.168.1.36";
+  const apiURL = `http://${ip}:8888/api`;
 
-  // Supposons que vous ayez une liste de pays disponible
-  const paysList = [
-    { id: '1', nom: 'France' },
-    { id: '2', nom: 'Allemagne' },
-    // ... autres pays ...
-  ];
-
-  const handleSave = () => {
-    // Logique d'enregistrement du nouvel acte de santé
-    console.log(`Nouvel acte de santé: ${nom}, Description: ${description}, Prix: ${prix}, Pays ID: ${paysId}`);
+  const handleSave = async () => {
+    try {
+      const newActeSante = {
+        nom,
+        description,
+        prix,
+        pays_id
+      };
+  
+      const response = await fetch(`${apiURL}/actesante`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newActeSante),
+      });
+  
+      if (response.ok) {
+        navigation.goBack();
+        console.log('Acte de santé ajouté avec succès.');
+      } else {
+        console.error('Échec de l\'ajout de l\acte de sante.');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout de l\acte de sante :', error);
+    }
   };
-
+  
   return (
     <ScrollView style={styles.container}>
+      <View style={styles.header}>
+        <Text style={styles.headerText}>Ajouter un Nouvel Acte de santé</Text>
+      </View>
       <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardHeaderText}>Ajouter un Acte de Santé</Text>
-        </View>
         <View style={styles.cardBody}>
-          <Text style={styles.label}>Nom</Text>
-          <TextInput
-            style={styles.input}
-            value={nom}
-            onChangeText={setNom}
-            placeholder="Nom de l'acte de santé"
-          />
-          <Text style={styles.label}>Description</Text>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            value={description}
-            onChangeText={setDescription}
-            placeholder="Description"
-            multiline
-            numberOfLines={4}
-          />
-          <Text style={styles.label}>Prix</Text>
-          <TextInput
-            style={styles.input}
-            value={prix}
-            onChangeText={setPrix}
-            keyboardType="numeric"
-            placeholder="Prix"
-          />
-          <Text style={styles.label}>Pays</Text>
-          <Picker
-            selectedValue={paysId}
-            onValueChange={(itemValue) => setPaysId(itemValue)}
-            style={styles.picker}
-          >
-            {paysList.map((pays) => (
-              <Picker.Item key={pays.id} label={pays.nom} value={pays.id} />
-            ))}
-          </Picker>
-          <TouchableOpacity style={styles.button} onPress={handleSave}>
-            <Text style={styles.buttonText}>Enregistrer</Text>
-          </TouchableOpacity>
+          <View style={styles.formGroup}>
+            <Text style={styles.label}>Nom</Text>
+            <TextInput
+              style={styles.input}
+              value={nom}
+              onChangeText={setNom}
+              placeholder="Nom de l'acte de santé"
+            />
+            <Text style={styles.label}>Description</Text>
+            <TextInput
+              style={styles.input}
+              value={description}
+              onChangeText={setDescription}
+              placeholder="Description"
+            />
+            <Text style={styles.label}>Prix</Text>
+            <TextInput
+              style={styles.input}
+              value={prix}
+              onChangeText={setPrix}
+              keyboardType="numeric"
+              placeholder="Prix"
+            />
+            <Text style={styles.label}>Pays ID</Text>
+            <TextInput
+              style={styles.input}
+              value={pays_id}
+              onChangeText={setPays}
+              keyboardType="numeric"
+              placeholder="Pays"
+            />
+            <TouchableOpacity style={styles.button} onPress={handleSave}>
+              <Text style={styles.buttonText}>Enregistrer</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </View>
     </ScrollView>
@@ -128,4 +142,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddActeDeSanteScreen;
+export default AddActesSanteScreen;

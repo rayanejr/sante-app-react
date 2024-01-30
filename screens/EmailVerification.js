@@ -2,7 +2,9 @@ import React from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 
 const EmailVerificationScreen = () => {
-  // Logique pour la vérification de l'email et la déconnexion
+  const ip = "192.168.1.36";
+  const apiURL = `http://${ip}:8888/api`;
+  
   const resendVerificationEmail = async () => {
     try {
         const token = await AsyncStorage.getItem('userToken'); // Remplacez par votre méthode d'authentification
@@ -25,7 +27,6 @@ const EmailVerificationScreen = () => {
         // Gérer les erreurs de réseau
     }
   } 
-
 
   return (
     <ScrollView style={styles.container}>

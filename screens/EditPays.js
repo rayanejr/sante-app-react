@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 
-const EditPaysScreen = ({ route }) => {
-  // Supposons que vous recevez les données du pays via les paramètres de route
-  const pays = route.params?.pays || null;
+const EditPaysScreen = ({ route, navigation }) => {
+  const paysId = route.params?.paysId || null;
 
-  // Si aucun pays n'est passé, retourner un message d'erreur
-  if (!pays) {
+  if (!paysId) {
     return (
       <View style={styles.container}>
         <Text style={styles.errorText}>Aucun pays trouvé pour modification.</Text>
@@ -14,13 +12,61 @@ const EditPaysScreen = ({ route }) => {
     );
   }
 
-  const [nom, setNom] = useState(pays.nom);
-  const [indiceCO2, setIndiceCO2] = useState(pays.indiceCO2.toString());
+  // État initial pour le pays
+  const [pays, setPays] = useState({
+    nom: '',
+    nom_anglais: ''
+  });
+  const ip = "192.168.1.36";
+  const apiURL = `http://${ip}:8888/api`;
 
-  const handleUpdate = () => {
-    // Logique de mise à jour du pays
-    console.log(`Mise à jour: ${nom}, Indice CO2: ${indiceCO2}`);
+  const getPays = async () => {
+    try {
+      const response = await fetch(`${apiURL}/paysid/${paysId}`);
+      if (!response.ok) {
+        throw new Error('La requête a échoué');
+      }
+      const data = await response.json();
+      setPays({
+        nom: data.nom || '',
+        nom_anglais: data.nom_anglais || '',
+      });
+    } catch (error) {
+      console.error('Erreur lors de la récupération des données :', error);
+    }
   };
+
+  const handleInputChange = (name, value) => {
+    setPays(prevState => ({
+      ...prevState,
+      [name]: value
+    }));
+  };
+
+  const handleUpdate = async () => {
+    try {
+      const response = await fetch(`${apiURL}/pays/${paysId}`, {
+        method: 'PATCH', 
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(pays),
+      });
+
+      if (response.ok) {
+        console.log('Pays mis à jour avec succès.');
+        navigation.goBack();
+      } else {
+        console.error('Échec de la mise à jour du pays.');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du pays :', error);
+    }
+  };
+
+  useEffect(() => {
+    getPays();
+  }, [paysId]);
 
   return (
     <ScrollView style={styles.container}>
@@ -29,20 +75,17 @@ const EditPaysScreen = ({ route }) => {
       </View>
       <View style={styles.card}>
         <View style={styles.cardBody}>
-          <Text style={styles.label}>Nom du Pays</Text>
+          <Text style={styles.label}>Nom</Text>
           <TextInput
             style={styles.input}
-            value={nom}
-            onChangeText={setNom}
-            placeholder="Nom du pays"
+            placeholder={pays.nom.toString()}
+            onChangeText={(value) => handleInputChange('nom', value)}
           />
-          <Text style={styles.label}>Indice CO2</Text>
+          <Text style={styles.label}>Nom anglais</Text>
           <TextInput
             style={styles.input}
-            value={indiceCO2}
-            onChangeText={(text) => setIndiceCO2(text)}
-            keyboardType="numeric"
-            placeholder="Indice CO2"
+            placeholder={pays.nom_anglais.toString()}
+            onChangeText={(value) => handleInputChange('nom_anglais', value)}
           />
           <TouchableOpacity style={styles.button} onPress={handleUpdate}>
             <Text style={styles.buttonText}>Mettre à jour</Text>
@@ -50,14 +93,14 @@ const EditPaysScreen = ({ route }) => {
         </View>
       </View>
     </ScrollView>
-  );
+  );  
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8f9fa',
     padding: 20,
+    backgroundColor: '#f8f9fa',
   },
   header: {
     marginBottom: 20,

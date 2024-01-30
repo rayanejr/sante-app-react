@@ -1,19 +1,42 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 
-const AddDeplacementsScreen = () => {
-  const [userId, setUserId] = useState('');
-  const [paysId, setPaysId] = useState('');
-  const [dateDepart, setDateDepart] = useState('');
-  const [dateRetour, setDateRetour] = useState('');
-  const [empreinteCO2, setEmpreinteCO2] = useState('');
+const AddDeplacementsScreen = ({navigation}) => {
+  const [user_id, setUserId] = useState('');
+  const [pays_id, setPaysId] = useState('');
+  const [pays_id2, setPaysId2] = useState('');
+  const [empreinte_co2, setEmpreinteCO2] = useState('');
+  const ip = "192.168.1.36";
+  const apiURL = `http://${ip}:8888/api`;
 
-  const handleSave = () => {
-    // Logique pour enregistrer le déplacement
-    console.log({ userId, paysId, dateDepart, dateRetour, empreinteCO2 });
-    // Ici, ajoutez votre logique pour enregistrer les données
+  const handleSave = async () => {
+    try {
+      const newDeplacement = {
+        user_id,
+        pays_id,
+        pays_id2,
+        empreinte_co2,
+      };
+  
+      const response = await fetch(`${apiURL}/deplacement`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(newDeplacement),
+      });
+  
+      if (response.ok) {
+        navigation.goBack();
+        console.log('Déplacement ajouté avec succès.');
+      } else {
+        console.error('Échec de l\'ajout du déplacement.');
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'ajout du déplacement :', error);
+    }
   };
-
+  
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -25,37 +48,31 @@ const AddDeplacementsScreen = () => {
             <Text style={styles.label}>Utilisateur ID</Text>
             <TextInput
               style={styles.input}
-              value={userId}
+              value={user_id}
               onChangeText={setUserId}
               keyboardType="numeric"
               placeholder="ID de l'utilisateur"
             />
-            <Text style={styles.label}>Pays ID</Text>
+            <Text style={styles.label}>Pays de départ</Text>
             <TextInput
               style={styles.input}
-              value={paysId}
+              value={pays_id}
               onChangeText={setPaysId}
               keyboardType="numeric"
               placeholder="ID du pays"
             />
-            <Text style={styles.label}>Date de Départ</Text>
+            <Text style={styles.label}>Pays d'arrivée</Text>
             <TextInput
               style={styles.input}
-              value={dateDepart}
-              onChangeText={setDateDepart}
-              placeholder="YYYY-MM-DD"
-            />
-            <Text style={styles.label}>Date de Retour</Text>
-            <TextInput
-              style={styles.input}
-              value={dateRetour}
-              onChangeText={setDateRetour}
-              placeholder="YYYY-MM-DD"
+              value={pays_id2}
+              onChangeText={setPaysId2}
+              keyboardType="numeric"
+              placeholder="ID du pays 2"
             />
             <Text style={styles.label}>Empreinte CO2</Text>
             <TextInput
               style={styles.input}
-              value={empreinteCO2}
+              value={empreinte_co2}
               onChangeText={setEmpreinteCO2}
               keyboardType="numeric"
               placeholder="Empreinte CO2"

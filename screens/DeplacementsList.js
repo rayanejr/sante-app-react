@@ -1,13 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, Dimensions } from 'react-native';
 
 const DeplacementsListScreen = ({ navigation }) => {
   const windowWidth = Dimensions.get('window').width;
-  const [deplacements, setDeplacements] = useState([
-    { id: 1, userId: 1, paysId: 1, dateDepart: '2022-07-01', dateRetour: '2022-07-15', empreinteCO2: 150 },
-    { id: 2, userId: 2, paysId: 2, dateDepart: '2022-08-01', dateRetour: '2022-08-15', empreinteCO2: 200 },
-    // ... autres déplacements ...
-  ]);
+  const [deplacements, setDeplacements] = useState([]);
+  const ip = "192.168.1.36";
+  const apiURL = `http://${ip}:8888/api`;
+
+  const getDeplacements = async () => {
+    try {
+      const response = await fetch(`${apiURL}/deplacement`); 
+      if (!response.ok) {
+        throw new Error('La requête a échoué');
+      }
+      const data = await response.json();
+      setDeplacements(data);
+    } catch (error) {
+      console.error('Erreur lors de la récupération des données de déplacement :', error);
+      throw error;
+    }
+  };
 
   const navigateToAddDeplacement = () => {
     navigation.navigate('AddDeplacements');
@@ -17,12 +29,29 @@ const DeplacementsListScreen = ({ navigation }) => {
     navigation.navigate('EditDeplacements', { deplacementId: id });
   };
 
-  const handleDelete = (id) => {
-    setDeplacements(deplacements.filter(deplacement => deplacement.id !== id));
-  };
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`${apiURL}/deplacement/${id}`, {
+        method: 'DELETE',
+      });
+  
+      if (response.ok) {
+        // Supprimer le déplacement avec l'ID spécifié de l'état deplacements
+        setDeplacements((prevDeplacements) => prevDeplacements.filter((deplacement) => deplacement.id !== id));
+        console.log('Déplacement supprimé avec succès.');
+      } else {
+        console.error('Échec de la suppression du déplacement.');
+      }
+    } catch (error) {
+      console.error('Erreur lors de la suppression du déplacement :', error);
+    }
+  };  
 
   const isSmallDevice = windowWidth < 768;
 
+  useEffect(() => {
+    getDeplacements();
+  }, []);
   return (
     <ScrollView style={styles.container}>
       <View style={[styles.header, isSmallDevice && styles.smallHeader]}>
@@ -38,11 +67,10 @@ const DeplacementsListScreen = ({ navigation }) => {
               <Text style={styles.cardHeaderText}>Déplacement ID: {deplacement.id}</Text>
             </View>
             <View style={styles.cardBody}>
-              <Text>Utilisateur ID: {deplacement.userId}</Text>
-              <Text>Pays ID: {deplacement.paysId}</Text>
-              <Text>Date de Départ: {deplacement.dateDepart}</Text>
-              <Text>Date de Retour: {deplacement.dateRetour}</Text>
-              <Text>Empreinte CO2: {deplacement.empreinteCO2}</Text>
+              <Text>Utilisateur ID: {deplacement.user_id}</Text>
+              <Text>Pays ID: {deplacement.pays_id}</Text>
+              <Text>Pays ID 2: {deplacement.pays_id2}</Text>
+              <Text>Empreinte CO2: {deplacement.empreinte_co2}</Text>
               <View style={styles.actions}>
                 <TouchableOpacity style={styles.actionButton} onPress={() => handleEdit(deplacement.id)}>
                   <Text style={styles.actionButtonText}>Modifier</Text>
