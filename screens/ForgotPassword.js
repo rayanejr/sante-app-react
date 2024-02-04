@@ -1,13 +1,36 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Button,  StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Alert, } from 'react-native';
+import { apiURL } from '@env';
 
-const ForgotPassword = () => {
+const ForgotPassword = ({ navigation }) => {
   const [email, setEmail] = useState('');
-  const ip = "192.168.1.36";
-  const apiURL = `http://${ip}:8888/api`;
 
-  const handleForgotPassword = () => {
-    // Ici, ajoutez votre logique pour la réinitialisation du mot de passe
+  const handleSendCode = async () => {
+    try {
+      const response = await fetch(apiURL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        // Gérer les erreurs venant de l'API
+        Alert.alert('Erreur', data.message || 'Quelque chose a mal tourné');
+      } else {
+        // Afficher un message de succès
+        Alert.alert('Succès', 'Le code a bien été envoyé. Veuillez vérifier votre boite mail.');
+        navigation.navigate('VerifyResetCode', {email:email} );
+      }
+    } catch (error) {
+      // Gérer les erreurs de réseau / requête
+      Alert.alert('Erreur', 'Impossible de se connecter au serveur');
+    }
   };
 
   return (
@@ -19,10 +42,9 @@ const ForgotPassword = () => {
         <View style={styles.cardBody}>
           <Text style={styles.infoText}>
             Vous avez oublié votre mot de passe ? Pas de problème. 
-            Indiquez-nous simplement votre adresse e-mail et nous vous enverrons un lien 
-            de réinitialisation de mot de passe qui vous permettra de choisir un nouveau.
+            Indiquez-nous simplement votre adresse e-mail et nous vous enverrons un code 
+            de réinitialisation de mot de passe qui vous permettra d'en choisir un nouveau.
           </Text>
-          {/* Affichez ici les erreurs de validation si nécessaire */}
 
           <TextInput
             style={styles.input}
@@ -32,16 +54,24 @@ const ForgotPassword = () => {
             keyboardType="email-address"
           />
 
-          <TouchableOpacity style={styles.button} onPress={handleForgotPassword}>
+          <TouchableOpacity style={styles.button} onPress={handleSendCode}>
             <Text style={styles.buttonText}>
               Envoyer le lien de réinitialisation du mot de passe
             </Text>
           </TouchableOpacity>
+            <View style={styles.resetPassword}>
+              <TouchableOpacity onPress={() => navigation.navigate('VerifyResetCode')}>
+                <Text style={styles.resetPasswordText}>
+                  Vous avez déjà reçu un code ? Cliquez ici
+                </Text>
+              </TouchableOpacity>
+            </View>
         </View>
       </View>
     </ScrollView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -92,6 +122,13 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
+  },
+  resetPassword: {
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  resetPasswordText: {
+    color: '#3490dc',
   }
 });
 
